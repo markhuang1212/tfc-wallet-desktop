@@ -1,6 +1,6 @@
 interface Transaction {
-    from: Account,
-    to: Account,
+    from: any,
+    to: any,
     amount: number
 }
 
