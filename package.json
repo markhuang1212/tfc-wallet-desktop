@@ -4,6 +4,7 @@
     "description": "",
     "main": "dist/main.js",
     "scripts": {
+        "clean": "rm -rf dist",
         "lint": "eslint 'src/**/*' --fix --ext .tx,.tsx,.js,.jsx ",
         "start": "webpack && electron .",
         "build": "webpack"
@@ -18,6 +19,7 @@
         "@types/react-dom": "^17.0.0",
         "@typescript-eslint/eslint-plugin": "^4.14.2",
         "@typescript-eslint/parser": "^4.14.2",
+        "copy-webpack-plugin": "^7.0.0",
         "electron": "^11.2.3",
         "eslint": "^7.19.0",
         "eslint-config-google": "^0.14.0",
