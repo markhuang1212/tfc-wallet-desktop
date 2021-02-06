@@ -1,4 +1,5 @@
 import { useState } from "react";
+import AccountListItem from "./AccountListItem";
 import ImportAccountView from "./ImportAccountVIew";
 
 interface AccountListViewProps {
@@ -12,7 +13,9 @@ function AccountListView(props: AccountListViewProps) {
         <div style={{
             backgroundColor: 'lightgray',
             flex: 1,
-            minWidth: '256px'
+            minWidth: '256px',
+            display: 'flex',
+            flexDirection: 'column',
         }}>
             <header style={{
                 display: 'flex',
@@ -24,8 +27,13 @@ function AccountListView(props: AccountListViewProps) {
                 <button onClick={props.onImportAccount}>Import/Create</button>
             </header>
 
-            <div>
+            <div style={{ flex: 1 }}>
+                <AccountListItem accountName="Account 1" accountType="bip44" isSelected={false} />
+                <AccountListItem accountName="Account 2" accountType="tfc" isSelected={false} />
+            </div>
 
+            <div style={{ padding: '8px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                <button>Export</button>
             </div>
         </div>
     )
