@@ -10,6 +10,8 @@ function AccountListView(props: AccountListViewProps) {
       backgroundColor: 'lightgray',
       flex: 1,
       minWidth: '256px',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       <header style={{
         display: 'flex',
@@ -21,7 +23,7 @@ function AccountListView(props: AccountListViewProps) {
         <button onClick={props.onImportAccount}>Import/Create</button>
       </header>
 
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, overflow: 'auto' }}>
         <AccountListItem accountName="Account 1" accountType="bip44" isSelected={false} />
         <AccountListItem accountName="Account 2" accountType="tfc" isSelected={false} />
       </div>

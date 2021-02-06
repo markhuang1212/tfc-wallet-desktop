@@ -1,7 +1,4 @@
-import React from 'react';
-
-// eslint-disable-next-line require-jsdoc
-function AccountDetailView() {
+function AccountDetailView(props: any) {
   return (
     <div style={{
       padding: '12px',
