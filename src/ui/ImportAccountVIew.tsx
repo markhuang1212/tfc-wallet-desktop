@@ -19,6 +19,9 @@ function ImportAccountView(props: ImportAccountViewProps) {
             padding: '8px'
         }}>
             <h2>Import Account</h2>
+            <div>
+                
+            </div>
         </div>
     )
 }
