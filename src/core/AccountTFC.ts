@@ -18,6 +18,12 @@ class AccountTFC extends AccountAbstract {
         return false
     }
 
+    constructor(privKey: any, pubKey: any) {
+        super()
+        this.privKey = privKey
+        this.pubKey = pubKey
+    }
+
 }
 
 export default AccountTFC
