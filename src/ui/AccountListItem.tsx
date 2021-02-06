@@ -1,7 +1,10 @@
+import AccountData from "./AccountData"
+
 interface AccountListItemProps {
   accountName: string
-  accountType: 'tfc' | 'eth' | 'btc' | 'usdt' | 'bip44'
-  isSelected: boolean
+  accountType: AccountData['accountType']
+  isFocused: boolean
+  onClick?: (subAccountIndex?: number) => any
 }
 
 function AccountListItem(props: AccountListItemProps) {
@@ -9,8 +12,9 @@ function AccountListItem(props: AccountListItemProps) {
     <div style={{
       display: 'flex',
       padding: '8px',
-      alignItems: 'center'
-    }}>
+      alignItems: 'center',
+      backgroundColor: props.isFocused ? 'gray' : 'inherit'
+    }} onClick={() => { props.onClick ? props.onClick() : undefined }}>
       <span style={{ fontSize: '12pt' }}>{props.accountName}</span>
       <span style={{ flex: 1 }}></span>
       <span style={{

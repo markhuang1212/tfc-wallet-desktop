@@ -1,10 +1,17 @@
+import { useState } from "react";
+import AccountData from "./AccountData";
 import AccountListItem from "./AccountListItem";
 
 interface AccountListViewProps {
+  accounts: AccountData[]
   onImportAccount: () => any
+  onSelectAccount: (index: number, subIndex?: number) => any
 }
 
 function AccountListView(props: AccountListViewProps) {
+
+  const [focusedItemIndex, setFocusedItemIndex] = useState(-1)
+
   return (
     <div style={{
       backgroundColor: 'lightgray',
@@ -20,16 +27,21 @@ function AccountListView(props: AccountListViewProps) {
       }}>
         <span>My Accounts</span>
         <span style={{ flex: 1 }}></span>
-        <button onClick={props.onImportAccount}>Import/Create</button>
       </header>
 
       <div style={{ flex: 1, overflow: 'auto' }}>
-        <AccountListItem accountName="Account 1" accountType="bip44" isSelected={false} />
-        <AccountListItem accountName="Account 2" accountType="tfc" isSelected={false} />
+        {props.accounts.map((account, i) =>
+          <AccountListItem
+            key={account.accountId}
+            accountName={account.accountName}
+            accountType={account.accountType}
+            isFocused={focusedItemIndex === i}
+            onClick={() => { setFocusedItemIndex(i); props.onSelectAccount(i) }} />
+        )}
       </div>
 
       <div style={{ padding: '8px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <button>Export</button>
+        <button onClick={props.onImportAccount}>Import/Create</button>
       </div>
     </div>
   )
