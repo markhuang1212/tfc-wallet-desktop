@@ -1,29 +1,32 @@
-import AccountAbstract from "./AccountAbstract";
+import AccountAbstract from './AccountAbstract';
 
+// eslint-disable-next-line require-jsdoc
 class AccountTFC extends AccountAbstract {
+  pubKey: any;
 
-    pubKey: any;
+  privKey: any;
 
-    privKey: any;
+  // eslint-disable-next-line require-jsdoc
+  async getAccountBalance() {
+    return 0n;
+  }
 
-    async getAccountBalance() {
-        return 0n
-    }
+  // eslint-disable-next-line require-jsdoc
+  async getAccountTransactionHistory() {
+    return [];
+  }
 
-    async getAccountTransactionHistory() {
-        return []
-    }
+  // eslint-disable-next-line require-jsdoc
+  async transfer(to: string, amount: number) {
+    return false;
+  }
 
-    async transfer(to: string, amount: number) {
-        return false
-    }
-
-    constructor(privKey: any, pubKey: any) {
-        super()
-        this.privKey = privKey
-        this.pubKey = pubKey
-    }
-
+  // eslint-disable-next-line require-jsdoc
+  constructor(privKey: any, pubKey: any) {
+    super();
+    this.privKey = privKey;
+    this.pubKey = pubKey;
+  }
 }
 
-export default AccountTFC
+export default AccountTFC;
