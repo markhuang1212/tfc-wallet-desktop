@@ -1,3 +1,6 @@
+/**
+ * The information of a specific type of crypto-currency, e.g. CoinTFC, CoinERC, etc.
+ */
 interface Coin {
     coinFullName: string
     coinAbbr: string
