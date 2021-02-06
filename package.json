@@ -36,6 +36,7 @@
     },
     "dependencies": {
         "bip44-constants": "^8.0.94",
+        "react-redux": "^7.2.2",
         "react-router-dom": "^5.2.0"
     }
 }
