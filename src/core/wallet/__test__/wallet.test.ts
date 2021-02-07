@@ -1,4 +1,4 @@
-import {CoinTypes, Wallet} from '../wallet';
+import {CoinTypes, Wallet} from '..';
 import * as bip39 from 'bip39';
 
 describe('wallet', () => {
