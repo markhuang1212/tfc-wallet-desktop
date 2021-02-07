@@ -8,6 +8,7 @@ interface AccountListItemProps {
   subAccounts?: {
     accountName: string
     accountType: AccountData['accountType']
+    accountId: string
   }[]
   onClick?: (subAccountIndex?: number) => any
 }
@@ -43,6 +44,7 @@ function AccountListItem(props: AccountListItemProps) {
             alignItems: 'center',
             backgroundColor: subAccountIndex === i ? 'gray' : 'inherit'
           }}
+            key={account.accountId}
             onClick={() => { setSubAccountIndex(i); props.onClick ? props.onClick(i) : undefined }}>
             <span style={{ fontSize: '12pt' }}>{account.accountName}</span>
             <span style={{ flex: 1 }}></span>
