@@ -1,4 +1,5 @@
-import {app, BrowserWindow} from 'electron';
+import { app, BrowserWindow } from 'electron';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 
 // eslint-disable-next-line require-jsdoc
 function createWindow() {
@@ -12,7 +13,10 @@ function createWindow() {
   win.loadFile('dist/index.html');
 }
 
-app.whenReady().then(createWindow);
+async function start() {
+  await app.whenReady()
+  createWindow()
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -25,3 +29,5 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+start()
