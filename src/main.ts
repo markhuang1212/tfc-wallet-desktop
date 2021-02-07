@@ -1,6 +1,12 @@
-import {app, BrowserWindow} from 'electron';
+import { app, BrowserWindow } from 'electron';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+import express from 'express'
+import path from 'path'
 
-// eslint-disable-next-line require-jsdoc
+const httpServer = express()
+httpServer.use('/', express.static('dist'))
+httpServer.listen(6790, 'localhost')
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -9,10 +15,14 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-  win.loadFile('dist/index.html');
+  win.loadURL('http://localhost:6790/index.html');
 }
 
-app.whenReady().then(createWindow);
+async function start() {
+  await app.whenReady()
+  await installExtension(REACT_DEVELOPER_TOOLS)
+  createWindow()
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -25,3 +35,5 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+start()

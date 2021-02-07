@@ -22,7 +22,7 @@ function AccountDetailView(props: AccountDetailViewProps) {
     <div style={{
       padding: '12px',
       flex: 3,
-    }}>{props.account.accountId}</div>
+    }}>{JSON.stringify(props.account, (_, value) => (typeof value === 'bigint' ? value.toString(): value), 4)}</div>
   );
 }
 

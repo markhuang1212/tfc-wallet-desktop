@@ -36,7 +36,8 @@ function AccountListView(props: AccountListViewProps) {
             accountName={account.accountName}
             accountType={account.accountType}
             isFocused={focusedItemIndex === i}
-            onClick={() => { setFocusedItemIndex(i); props.onSelectAccount(i) }} />
+            subAccounts={account.subAccounts}
+            onClick={(subIndex) => { setFocusedItemIndex(i); props.onSelectAccount(i, subIndex) }} />
         )}
       </div>
 
