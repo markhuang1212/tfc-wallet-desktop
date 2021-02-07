@@ -53,7 +53,11 @@ function App() {
   const [accountDetailData, setAccountDetailData] = useState<AccountData | undefined>(undefined)
 
   const onSelectAccount = (index: number, subIndex?: number) => {
-    setAccountDetailData({ ...accountData[index] })
+    if (subIndex === undefined) {
+      setAccountDetailData({ ...accountData[index] })
+    } else {
+      setAccountDetailData({ ...accountData[index].subAccounts![subIndex] })
+    }
   }
 
   return (<div style={{
