@@ -50,7 +50,6 @@ import { ipcRenderer } from 'electron';
 function App() {
   const [isImportingAccount, setIsImportingAccount] = useState(false)
   const [accountData, setAccountData] = useState<AccountData[]>([])
-  const [selectedAccount, setSelectedAccount] = useState(undefined)
   const [accountDetailData, setAccountDetailData] = useState<AccountData | undefined>(undefined)
 
   useEffect(() => {
@@ -63,6 +62,10 @@ function App() {
     } else {
       setAccountDetailData({ ...accountData[index].subAccounts![subIndex] })
     }
+  }
+
+  const handleImport = (action: any) => {
+    setIsImportingAccount(false)
   }
 
   return (<div style={{
@@ -80,7 +83,8 @@ function App() {
       accounts={accountData}
       onSelectAccount={onSelectAccount} />
     <AccountDetailView account={accountDetailData} />
-    <ImportAccountView visible={isImportingAccount} />
+
+    <ImportAccountView visible={isImportingAccount} onFinish={handleImport}/>
   </div>);
 }
 
