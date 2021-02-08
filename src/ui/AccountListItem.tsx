@@ -42,7 +42,7 @@ function AccountListItem(props: AccountListItemProps) {
             display: 'flex',
             padding: '8px 8px 8px 24px',
             alignItems: 'center',
-            backgroundColor: subAccountIndex === i ? 'gray' : 'inherit'
+            backgroundColor: subAccountIndex === i && props.isFocused ? 'gray' : 'inherit'
           }}
             key={account.accountId}
             onClick={() => { setSubAccountIndex(i); props.onClick ? props.onClick(i) : undefined }}>
