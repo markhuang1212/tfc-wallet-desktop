@@ -50,6 +50,10 @@ ipcMain.handle('get-accounts', async () => {
     return demoData
 })
 
+ipcMain.handle('rename-account', async (event, accountId: string, newName: string) => {
+    return true
+})
+
 ipcMain.handle('add-account', async (event, accountData: AccountData) => {
 
 })

@@ -5,7 +5,7 @@ import AccountDetailView from './AccountDetailView';
 import AccountListView from './AccountListView';
 import ImportAccountView from './ImportAccountVIew';
 import { ipcRenderer } from 'electron';
-import { makeStyles } from '@material-ui/styles';
+import '@fontsource/roboto'
 
 function App() {
   const [isImportingAccount, setIsImportingAccount] = useState(false)
