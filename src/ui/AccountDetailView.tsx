@@ -45,11 +45,14 @@ function AccountDetailView(props: AccountDetailViewProps) {
       <Container maxWidth="sm">
         {props.account ?
           <div className={classes.content}>
-            <div style={{ display: props.account?.accountType === 'bip44' ? 'none' : 'block', marginTop: '24px'}}>
+            <div style={{ display: props.account?.accountType === 'bip44' ? 'none' : 'block', marginTop: '24px' }}>
               <Typography variant="subtitle1">Balance</Typography>
               <Typography variant="h2">{props.account?.accountBalance?.toString()}</Typography>
             </div>
-            <TextField style={{marginTop: '24px'}} variant="outlined" value={accountName} onChange={changeAccountName} label="Account Name" />
+            <TextField style={{ marginTop: '24px' }}
+              variant="outlined" value={accountName}
+              onChange={changeAccountName}
+              label="Account Name" />
           </div> :
           <div>
             Select An Account

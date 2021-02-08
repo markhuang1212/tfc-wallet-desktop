@@ -24,10 +24,6 @@ function App() {
     }
   }
 
-  const handleImport = (action: any) => {
-    setIsImportingAccount(false)
-  }
-
   return (<div style={{
     display: 'flex',
     flexDirection: 'row',
@@ -45,7 +41,10 @@ function App() {
 
     <AccountDetailView account={accountDetailData} />
 
-    <ImportAccountView visible={isImportingAccount} onFinish={handleImport} />
+    <ImportAccountView visible={isImportingAccount}
+      onCancel={() => setIsImportingAccount(false)}
+      onCreateAccount={() => { }}
+      onImportAccount={() => { }} />
   </div>);
 }
 

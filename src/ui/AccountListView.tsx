@@ -45,7 +45,7 @@ function AccountListView(props: AccountListViewProps) {
         </div>
 
         <div style={{ padding: '8px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-          <Button onClick={props.onImportAccount}>Import/Create</Button>
+          <Button onClick={props.onImportAccount} color="primary">Import/Create</Button>
         </div>
       </div>
     )
