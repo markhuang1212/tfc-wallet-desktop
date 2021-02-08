@@ -1,5 +1,7 @@
 import { useState } from "react"
-import {AccountData} from "./Types"
+import { AccountData } from "./Types"
+import { ListItem, ListItemText } from '@material-ui/core'
+import React from "react"
 
 interface AccountListItemProps {
   accountName: string
@@ -10,54 +12,32 @@ interface AccountListItemProps {
     accountType: AccountData['accountType']
     accountId: string
   }[]
-  onClick?: (subAccountIndex?: number) => any
+  onClick: (subAccountIndex?: number) => any
 }
 
 function AccountListItem(props: AccountListItemProps) {
+
   const [subAccountIndex, setSubAccountIndex] = useState(-1)
+
   return (
-    <div style={{
-      display: 'flex',
-      justifyItems: 'stretch',
-      flexDirection: 'column'
-    }}>
-      <div style={{
-        display: 'flex',
-        padding: '8px',
-        alignItems: 'center',
-        backgroundColor: props.isFocused && subAccountIndex === -1 ? 'gray' : 'inherit'
-      }} onClick={() => { props.onClick ? props.onClick() : undefined; setSubAccountIndex(-1) }}>
-        <span style={{ fontSize: '12pt' }}>{props.accountName}</span>
-        <span style={{ flex: 1 }}></span>
-        <span style={{
-          fontSize: '10pt',
-          border: '0.5px solid gray',
-          borderRadius: '4px',
-          padding: '2px'
-        }}>{props.accountType}</span>
-      </div>
+    <React.Fragment>
+      <ListItem button
+        selected={props.isFocused && subAccountIndex === -1}
+        onClick={() => { props.onClick(); setSubAccountIndex(-1) }}>
+        <ListItemText primary={props.accountName} secondary={props.accountType} />
+      </ListItem>
       {props.accountType == 'bip44' &&
         props.subAccounts!.map((account, i) => (
-          <div style={{
-            display: 'flex',
-            padding: '8px 8px 8px 24px',
-            alignItems: 'center',
-            backgroundColor: subAccountIndex === i && props.isFocused ? 'gray' : 'inherit'
-          }}
+          <ListItem button
+            style={{ paddingLeft: '32px' }}
             key={account.accountId}
-            onClick={() => { setSubAccountIndex(i); props.onClick ? props.onClick(i) : undefined }}>
-            <span style={{ fontSize: '12pt' }}>{account.accountName}</span>
-            <span style={{ flex: 1 }}></span>
-            <span style={{
-              fontSize: '10pt',
-              border: '0.5px solid gray',
-              borderRadius: '4px',
-              padding: '2px'
-            }}>{account.accountType}</span>
-          </div>
+            onClick={() => { setSubAccountIndex(i); props.onClick(i) }}
+            selected={props.isFocused && subAccountIndex === i}>
+            <ListItemText primary={account.accountName} secondary={account.accountType} />
+          </ListItem>
         ))
       }
-    </div>
+    </React.Fragment>
   )
 }
 

@@ -1,7 +1,7 @@
 import { AccountData } from "./Types";
-import { AppBar, Button, Container, TextField, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Button, Container, IconButton, InputAdornment, TextField, Toolbar, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import { ImportExport } from '@material-ui/icons'
+import { ImportExport,Check } from '@material-ui/icons'
 import { useEffect, useState } from "react";
 
 const useStyle = makeStyles({
@@ -52,10 +52,14 @@ function AccountDetailView(props: AccountDetailViewProps) {
             <TextField style={{ marginTop: '24px' }}
               variant="outlined" value={accountName}
               onChange={changeAccountName}
-              label="Account Name" />
+              label="Account Name"
+              InputProps={{
+                endAdornment: props.account.accountName !== accountName ? (<IconButton color="primary"><Check></Check></IconButton>) : undefined
+              }}>
+            </TextField>
           </div> :
           <div>
-            Select An Account
+            <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>Select An Account</Typography>
           </div>
         }
 
