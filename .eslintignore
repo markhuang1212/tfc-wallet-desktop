@@ -127,3 +127,7 @@ out
 gen
 
 *.html
+# only lint code in src/core
+src/app
+src/ui
+src/main.ts
