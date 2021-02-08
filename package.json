@@ -41,6 +41,9 @@
         "webpack-cli": "^4.5.0"
     },
     "dependencies": {
+        "@material-ui/core": "^4.11.3",
+        "@material-ui/icons": "^4.11.2",
+        "@material-ui/styles": "^4.11.3",
         "@types/express": "^4.17.11",
         "bip39": "^3.0.3",
         "bip44-constants": "^8.0.94",
