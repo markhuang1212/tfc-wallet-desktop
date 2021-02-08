@@ -29,6 +29,12 @@ module.exports = [
         test: /\.ts(x?)$/,
         include: /src/,
         use: [{ loader: 'ts-loader' }],
+      }, {
+        test: /\.woff(2?)$/,
+        use: [{ loader: 'file-loader' }]
+      }, {
+        test: /\.css$/,
+        use: [{ loader: 'css-loader' }]
       }],
     },
     plugins: [
