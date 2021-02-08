@@ -17,6 +17,9 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
+  // if (process.env.NODE_ENV === 'development') {
+  //   win.webContents.openDevTools()
+  // }
   win.loadURL('http://localhost:6790/index.html');
 }
 
