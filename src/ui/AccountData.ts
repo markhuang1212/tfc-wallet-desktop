@@ -7,6 +7,7 @@ interface AccountData {
     accountBalance?: bigint
 
     coin?: Coin // for non bip-44 account
+    accountPath?: string // for bip44 sub-accounts
     subAccounts?: AccountData[] // for bip-44 account
 
     passPhrase: string[]

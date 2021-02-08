@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import express from 'express'
-import path from 'path'
+import './app/signal_handlers.ts'
 
 const httpServer = express()
 httpServer.use('/', express.static('dist'))

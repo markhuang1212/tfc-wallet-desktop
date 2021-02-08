@@ -1,28 +1,53 @@
+/**
+ * The front-end (UI) communicate with the backend through
+ * a set of signal handlers listed in this file.
+ */
+
 import { ipcMain } from 'electron'
-import Coin from '../core/Coin'
+import { AccountData, TxInfo } from './Types'
+import { v4 as uuidv4 } from 'uuid'
 
-interface TxInfo {
-    from: string,
-    to: string,
-    amount: bigint
-}
-
-interface AccountData {
-    accountId: string,
-    accountType: 'bip44' | 'tfc' | 'eth' | 'btc' | 'erc20',
-    accountName: string,
-    accountBalance?: bigint
-
-    coin?: Coin // for non bip-44 account
-    subAccounts?: AccountData[] // for bip-44 account
-
-    passPhrase: string[]
-    privKey: string
-    pubKey: string
-}
+const demoData: AccountData[] = [
+    {
+        accountName: 'TFC Account',
+        accountType: 'tfc',
+        accountBalance: 1000n,
+        accountId: uuidv4(),
+        passPhrase: ['some', 'array'],
+        privKey: 'privKey',
+        pubKey: 'pubKey'
+    }, {
+        accountType: 'bip44',
+        accountName: 'BIP-44 Account',
+        accountId: uuidv4(),
+        passPhrase: ['some', 'array'],
+        privKey: 'privKey',
+        pubKey: 'pubKey',
+        subAccounts: [
+            {
+                accountName: 'BTC Account',
+                accountType: 'btc',
+                accountBalance: 5000n,
+                accountId: uuidv4(),
+                passPhrase: ['some', 'array'],
+                privKey: 'privKey',
+                pubKey: 'pubKey'
+            },
+            {
+                accountName: 'ETH Account',
+                accountType: 'eth',
+                accountBalance: 5000n,
+                accountId: uuidv4(),
+                passPhrase: ['some', 'array'],
+                privKey: 'privKey',
+                pubKey: 'pubKey'
+            }
+        ]
+    }
+]
 
 ipcMain.handle('get-accounts', async () => {
-
+    return demoData
 })
 
 ipcMain.handle('add-account', async (event, accountData: AccountData) => {
