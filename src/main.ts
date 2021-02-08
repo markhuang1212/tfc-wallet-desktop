@@ -3,12 +3,6 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 import express from 'express'
 import './app/signal_handlers.ts'
 
-if (process.env.NODE_ENV !== 'development') {
-  const httpServer = express()
-  httpServer.use('/', express.static('dist'))
-  httpServer.listen(6790, 'localhost')
-}
-
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -17,15 +11,18 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-  // if (process.env.NODE_ENV === 'development') {
-  //   win.webContents.openDevTools()
-  // }
-  win.loadURL('http://localhost:6790/index.html');
+  if (process.env.APP_ENV === 'development') {
+    win.loadURL('http://localhost:6790/index.html');
+  } else {
+    win.loadFile('./dist/index.html')
+  }
 }
 
 async function start() {
   await app.whenReady()
-  await installExtension(REACT_DEVELOPER_TOOLS)
+  if (process.env.APP_ENV === 'development') {
+    await installExtension(REACT_DEVELOPER_TOOLS)
+  }
   createWindow()
 }
 
