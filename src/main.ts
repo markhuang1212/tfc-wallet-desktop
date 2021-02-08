@@ -3,9 +3,11 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 import express from 'express'
 import './app/signal_handlers.ts'
 
-const httpServer = express()
-httpServer.use('/', express.static('dist'))
-httpServer.listen(6790, 'localhost')
+if (process.env.NODE_ENV !== 'development') {
+  const httpServer = express()
+  httpServer.use('/', express.static('dist'))
+  httpServer.listen(6790, 'localhost')
+}
 
 function createWindow() {
   const win = new BrowserWindow({

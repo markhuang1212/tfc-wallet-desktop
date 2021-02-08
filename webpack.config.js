@@ -9,7 +9,7 @@ module.exports = [
       rules: [{
         test: /\.ts$/,
         include: /src/,
-        use: [{loader: 'ts-loader'}],
+        use: [{ loader: 'ts-loader' }],
       }],
     },
     output: {
@@ -28,13 +28,13 @@ module.exports = [
       rules: [{
         test: /\.ts(x?)$/,
         include: /src/,
-        use: [{loader: 'ts-loader'}],
+        use: [{ loader: 'ts-loader' }],
       }],
     },
     plugins: [
       new CopyPlugin({
         patterns: [
-          {from: 'src/ui/index.html', to: 'index.html'},
+          { from: 'src/ui/index.html', to: 'index.html' },
         ],
       }),
     ],
@@ -42,5 +42,9 @@ module.exports = [
       path: __dirname + '/dist',
       filename: 'ui.js',
     },
+    devServer: {
+      port: 6790,
+      contentBase: 'dist'
+    }
   },
 ];
