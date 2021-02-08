@@ -15,4 +15,4 @@ interface AccountData {
     pubKey: string
 }
 
-export default AccountData
+export { AccountData }

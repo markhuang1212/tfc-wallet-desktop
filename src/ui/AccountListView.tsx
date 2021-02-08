@@ -1,6 +1,12 @@
 import { useState } from "react";
-import AccountData from "./AccountData";
+import { AccountData } from "./Types";
 import AccountListItem from "./AccountListItem";
+import { Divider, makeStyles, Toolbar, Typography, Button } from "@material-ui/core";
+import { getThemeProps } from "@material-ui/styles";
+
+const useStyles = makeStyles(theme => ({
+
+}))
 
 interface AccountListViewProps {
   accounts: AccountData[]
@@ -10,42 +16,39 @@ interface AccountListViewProps {
 
 function AccountListView(props: AccountListViewProps) {
 
-  const [focusedItemIndex, setFocusedItemIndex] = useState(-1)
+    const [focusedItemIndex, setFocusedItemIndex] = useState(-1)
+    const classes = useStyles()
 
-  return (
-    <div style={{
-      backgroundColor: 'lightgray',
-      flex: 1,
-      minWidth: '256px',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <header style={{
+    return (
+      <div style={{
+        // backgroundColor: 'lightgray',
+        flex: 0,
+        minWidth: '240px',
         display: 'flex',
-        borderBottom: 'solid 1px gray',
-        padding: '8px',
+        flexDirection: 'column'
       }}>
-        <span>My Accounts</span>
-        <span style={{ flex: 1 }}></span>
-      </header>
+        <Toolbar>
+          <Typography>My Accounts</Typography>
+        </Toolbar>
+        <Divider />
 
-      <div style={{ flex: 1, overflow: 'auto' }}>
-        {props.accounts.map((account, i) =>
-          <AccountListItem
-            key={account.accountId}
-            accountName={account.accountName}
-            accountType={account.accountType}
-            isFocused={focusedItemIndex === i}
-            subAccounts={account.subAccounts}
-            onClick={(subIndex) => { setFocusedItemIndex(i); props.onSelectAccount(i, subIndex) }} />
-        )}
-      </div>
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {props.accounts.map((account, i) =>
+            <AccountListItem
+              key={account.accountId}
+              accountName={account.accountName}
+              accountType={account.accountType}
+              isFocused={focusedItemIndex === i}
+              subAccounts={account.subAccounts}
+              onClick={(subIndex) => { setFocusedItemIndex(i); props.onSelectAccount(i, subIndex) }} />
+          )}
+        </div>
 
-      <div style={{ padding: '8px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <button onClick={props.onImportAccount}>Import/Create</button>
+        <div style={{ padding: '8px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+          <Button onClick={props.onImportAccount}>Import/Create</Button>
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
 
 export default AccountListView;

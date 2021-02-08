@@ -1,52 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ReactDom from 'react-dom';
-import AccountData from './AccountData';
+import { AccountData } from './Types';
 import AccountDetailView from './AccountDetailView';
 import AccountListView from './AccountListView';
 import ImportAccountView from './ImportAccountVIew';
-import { v4 as uuidv4 } from 'uuid'
 import { ipcRenderer } from 'electron';
+import { makeStyles } from '@material-ui/styles';
 
-// const demoData: AccountData[] = [
-//   {
-//     accountName: 'TFC Account',
-//     accountType: 'tfc',
-//     accountBalance: 1000n,
-//     accountId: uuidv4(),
-//     passPhrase: ['some', 'array'],
-//     privKey: 'privKey',
-//     pubKey: 'pubKey'
-//   }, {
-//     accountType: 'bip44',
-//     accountName: 'BIP-44 Account',
-//     accountId: uuidv4(),
-//     passPhrase: ['some', 'array'],
-//     privKey: 'privKey',
-//     pubKey: 'pubKey',
-//     subAccounts: [
-//       {
-//         accountName: 'BTC Account',
-//         accountType: 'btc',
-//         accountBalance: 5000n,
-//         accountId: uuidv4(),
-//         passPhrase: ['some', 'array'],
-//         privKey: 'privKey',
-//         pubKey: 'pubKey'
-//       },
-//       {
-//         accountName: 'ETH Account',
-//         accountType: 'eth',
-//         accountBalance: 5000n,
-//         accountId: uuidv4(),
-//         passPhrase: ['some', 'array'],
-//         privKey: 'privKey',
-//         pubKey: 'pubKey'
-//       }
-//     ]
-//   }
-// ]
-
-// eslint-disable-next-line require-jsdoc
 function App() {
   const [isImportingAccount, setIsImportingAccount] = useState(false)
   const [accountData, setAccountData] = useState<AccountData[]>([])
@@ -82,9 +42,10 @@ function App() {
       onImportAccount={() => { setIsImportingAccount(!isImportingAccount); }}
       accounts={accountData}
       onSelectAccount={onSelectAccount} />
+
     <AccountDetailView account={accountDetailData} />
 
-    <ImportAccountView visible={isImportingAccount} onFinish={handleImport}/>
+    <ImportAccountView visible={isImportingAccount} onFinish={handleImport} />
   </div>);
 }
 

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import AccountData from "./AccountData"
+import {AccountData} from "./Types"
 
 interface AccountListItemProps {
   accountName: string

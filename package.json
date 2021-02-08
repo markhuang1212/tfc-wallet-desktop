@@ -8,8 +8,7 @@
         "clean": "rm -rf dist",
         "lint": "eslint 'src/**/*' --fix --ext .tx,.tsx,.js,.jsx ",
         "lint:core": "eslint 'src/core/**/*' --fix --ext .tx,.tsx,.js,.jsx ",
-        "start": "webpack . && NODE_ENV=development electron .",
-        "dev": "webpack serve"
+        "start": "webpack serve & NODE_ENV=development electron ."
     },
     "keywords": [],
     "author": "",

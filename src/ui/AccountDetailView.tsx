@@ -1,4 +1,4 @@
-import AccountData from "./AccountData";
+import {AccountData} from "./Types";
 import { AppBar, Button, Toolbar, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport } from '@material-ui/icons'
