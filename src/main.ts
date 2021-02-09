@@ -38,8 +38,4 @@ app.on('activate', () => {
   }
 });
 
-app.on('before-quit', () => {
-  RedisServerShared.process.kill()
-})
-
 start()

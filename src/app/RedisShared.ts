@@ -20,4 +20,8 @@ const REDIS_PORT = 6791
 const RedisServerShared = new RedisServer(REDIS_PORT)
 const RedisClientShared = new Redis(REDIS_PORT);
 
+app.on('before-quit', () => {
+    RedisServerShared.process.kill()
+})
+
 export { RedisClientShared, RedisServerShared }
