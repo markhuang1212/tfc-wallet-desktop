@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+import { RedisServerShared } from './app/RedisShared';
 import './app/signal_handlers.ts'
 
 function createWindow() {
@@ -36,5 +37,9 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+app.on('before-quit', () => {
+  RedisServerShared.process.kill()
+})
 
 start()

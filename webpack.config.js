@@ -5,6 +5,9 @@ module.exports = [
     mode: 'development',
     entry: './src/main.ts',
     target: 'electron-main',
+    resolve: {
+      extensions: ['.ts', '.tsx', '.js'],
+    },
     module: {
       rules: [{
         test: /\.ts$/,
