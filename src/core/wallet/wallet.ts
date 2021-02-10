@@ -1,133 +1,86 @@
-import {Bip32Node, Bip32Root} from './bip32';
+import HDNode from 'hdkey';
+import {HDWallet} from './bip32';
+import {
+  CoinDefines, CoinTypes,
+} from './coins';
+import {Account, CoinWallet, CoinWalletJSON} from './coin-wallet';
 
-/**
- * Representation of Coin level in BIP44
- * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
- */
-export class Coin extends Bip32Node {
-  /**
-   * Constructor
-   *
-   * @param {Bip32Root} root the BIP44 root node "m/44'"
-   * @param {number} coinType number of the coin type
-   * @param {AddressClass} AddressClass the class that
-   * defines the algorithm to generate address from BIP32 HDKey
-   */
+
+export interface WalletJSON {
+  seed: string,
+  coinWallets: {
+    [coinIndex: number]: CoinWalletJSON,
+  }
+}
+
+
+// eslint-disable-next-line require-jsdoc
+export class Wallet extends HDWallet {
+  readonly coinWallets: Record<number, CoinWallet<Account>> = {};
+
+  // eslint-disable-next-line require-jsdoc
   constructor(
-      root: Bip32Root, coinType: number,
-    readonly AddressClass: new (c: Change, i: number) => Address) {
-    super(root, `${coinType}'`);
+    public readonly seed: Buffer,
+    coinWallets: {[coinIndex: number]: CoinWalletJSON} = {},
+  ) {
+    super(HDNode.fromMasterSeed(seed).derive('m/44\''));
+    for (const coinName in CoinTypes) {
+      if (!CoinTypes.hasOwnProperty(coinName)) {
+        continue;
+      }
+      // @ts-ignore
+      const coinType = CoinTypes[coinName];
+      if (!CoinDefines.hasOwnProperty(coinType)) {
+        continue;
+      }
+      const wallet = CoinWallet.fromJSON(coinWallets[coinType]);
+      if (wallet) {
+        this.coinWallets[coinType] = wallet;
+      } else {
+        this.coinWallets[coinType] = new CoinWallet(
+            this.hdNode.derive(`m/${coinType}'`),
+            coinType,
+        );
+      }
+    }
   }
 
-  /**
-   * Get the Account level Node defined in BIP44
-   *
-   * @param {number} index index of the account node
-   * @return {Account}
-   */
-  getAccount(index: number): Account {
-    return new Account(this, index);
+  // eslint-disable-next-line require-jsdoc
+  getCoinWallet(coinType: number): CoinWallet<Account> | undefined {
+    return this.coinWallets[coinType];
   }
 
-  /**
-   * Get the Address level node defined in BIP44 using Account 0 and Change 0
-   *
-   * @param {number} index index of the address node
-   * @return {Address}
-   */
-  getAddress(index: number): Address {
-    return new this.AddressClass(
-        this.getAccount(0).getChange(0), index,
-    );
-  }
-}
-
-/**
- * Representation of Account level node in BIP44.
- * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
- */
-export class Account extends Bip32Node {
-  /**
-   * Constructor
-   *
-   * @param {Coin} coin the parent Coin node
-   * @param {number} index the index of current account node
-   */
-  constructor(
-      coin: Coin, index: number) {
-    super(coin, `${index}'`);
+  // eslint-disable-next-line require-jsdoc
+  isValidBip44Path(path: string): boolean {
+    try {
+      this.hdNode.derive(path);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  /**
-   * Get the Change level Node defined in BIP44
-   *
-   * @param {number} index index of the change node
-   * @return {Change}
-   */
-  getChange(index: number): Change {
-    return new Change(this, index);
+  // eslint-disable-next-line require-jsdoc
+  toJSON(): WalletJSON {
+    const obj: {[coinIndex: number]: CoinWalletJSON} = {};
+    for (const coinIndex in this.coinWallets) {
+      if (!this.coinWallets.hasOwnProperty(coinIndex)) {
+        continue;
+      }
+      obj[coinIndex] = this.coinWallets[coinIndex].toJSON();
+    }
+    return {
+      seed: this.seed.toString('hex'),
+      coinWallets: obj,
+    };
   }
 
-  /**
-   * Get the Address level node defined in BIP44 using Change 0
-   *
-   * @param {number} index index of the address node
-   * @return {Address}
-   */
-  getAddress(index: number): Address {
-    const coin = this.parent as Coin;
-    return new coin.AddressClass(this.getChange(0), index);
+  // eslint-disable-next-line require-jsdoc
+  static fromJSON(obj: WalletJSON): Wallet | undefined {
+    if (!obj) {
+      return undefined;
+    }
+    return new Wallet(Buffer.from(obj.seed, 'hex'), obj.coinWallets);
   }
 }
 
-/**
- * Representation of Change level node in BIP44.
- * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
- */
-export class Change extends Bip32Node {
-  /**
-   * Constructor
-   *
-   * @param {Account} account the parent Account node
-   * @param {number} index the index of current change node
-   */
-  constructor(
-      account: Account, index: number) {
-    super(account, `${index}`);
-  }
-
-  /**
-   * Get the Address level node defined in BIP44.
-   *
-   * @param {number} index index of the address node
-   * @return {Address}
-   */
-  getAddress(index: number): Address {
-    const change = this.parent as Change;
-    const coin = change.parent as Coin;
-    return new coin.AddressClass(this, index);
-  }
-}
-
-/**
- * Representation of Address level node in BIP44.
- * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
- */
-export abstract class Address extends Bip32Node {
-  /**
-   * Constructor
-   *
-   * @param {Change} change the parent Change node
-   * @param {number} index the index of current address node
-   */
-  protected constructor(
-      change: Change, index: number) {
-    super(change, `${index}`);
-  }
-
-  abstract get privateKey(): Buffer;
-
-  abstract get publicKey(): Buffer;
-
-  abstract toString(): string;
-}
