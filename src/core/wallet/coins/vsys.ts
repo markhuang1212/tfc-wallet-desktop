@@ -1,4 +1,4 @@
-import {Account} from '../coin-wallet';
+import {Account} from '../account';
 import vsys from '@virtualeconomy/js-v-sdk';
 
 const base58 = require('base-58');

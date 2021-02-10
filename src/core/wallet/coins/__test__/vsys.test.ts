@@ -1,7 +1,7 @@
 
 const vsys = require('@virtualeconomy/js-v-sdk');
 import {Wallet} from '../../wallet';
-import {CoinCode} from '../defines';
+import {CoinCode} from '../../../defines';
 
 const base58 = require('base-58');
 

@@ -1,25 +1,16 @@
+import {CoinCode} from '../../defines';
+import {BtcAccount} from './btc';
 import {EthAccount} from './eth';
 import {TfcAccount} from './tfc';
 import {VsysAccount} from './vsys';
-import {BtcAccount} from './btc';
 
 export interface CoinType<T extends CoinCode> {
   index: number,
   hexa: string,
-  symbol: string
+  symbol: string,
   name: string,
   AccountImpl: new (privateKey: Buffer) => AccountImplMapping[T],
 }
-
-/* eslint-disable no-unused-vars */
-export enum CoinCode {
-  BTC = 0,
-  ETH = 60,
-  TFC = 599,
-  VSYS = 360,
-}
-
-/* eslint-enable no-unused-vars */
 
 export type AccountImplMapping = {
   [CoinCode.BTC]: BtcAccount,
@@ -63,4 +54,3 @@ export const CoinDefines: {
     AccountImpl: VsysAccount,
   },
 };
-

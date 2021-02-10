@@ -1,5 +1,5 @@
 import * as ethUtil from 'ethereumjs-util';
-import {Account} from '../coin-wallet';
+import {Account} from '../account';
 
 
 // eslint-disable-next-line require-jsdoc

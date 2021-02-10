@@ -1,5 +1,5 @@
 import {Wallet} from '../../wallet';
-import {CoinCode} from '../defines';
+import {CoinCode} from '../../../defines';
 
 describe('BtcAccount', ()=>{
   test('should get address correctly', ()=>{

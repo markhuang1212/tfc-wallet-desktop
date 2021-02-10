@@ -1,6 +1,6 @@
 import {Wallet} from '../wallet';
 import * as bip39 from 'bip39';
-import {CoinCode} from '../coins';
+import {CoinCode} from '../../defines';
 
 describe('wallet', () => {
   test('should generate correct ETH address', () => {
@@ -88,7 +88,8 @@ describe('wallet', () => {
         .toEqual(acc0.address);
     expect(Wallet.getAccount(seed, bip44Path).address)
         .toEqual(acc0.address);
-    expect(Wallet.getAccount(seed.toString('hex'), CoinCode.BTC, 'm/0\'/0/0').address)
+    expect(Wallet.getAccount(
+        seed.toString('hex'), CoinCode.BTC, 'm/0\'/0/0').address)
         .toEqual(acc0.address);
   });
 });

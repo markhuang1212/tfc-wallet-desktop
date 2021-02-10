@@ -1,4 +1,4 @@
-import {Account} from '../coin-wallet';
+import {Account} from '../account';
 import * as bitcoin from 'bitcoinjs-lib';
 
 // eslint-disable-next-line require-jsdoc

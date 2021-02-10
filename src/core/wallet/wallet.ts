@@ -1,8 +1,10 @@
 import HDNode from 'hdkey';
 import {HDWallet} from './bip32';
-import {AccountImplMapping, CoinCode, CoinDefines} from './coins';
-import {Account, CoinWallet, CoinWalletJSON} from './coin-wallet';
+import {CoinCode} from '../defines';
+import {CoinWallet, CoinWalletJSON} from './coin-wallet';
 import * as bip39 from 'bip39';
+import {AccountImplMapping, CoinDefines} from './coins/defines';
+import {Account} from './account';
 
 type Bytes = string | Buffer;
 

@@ -1,26 +1,7 @@
-
 import {HDWallet} from './bip32';
 import HDNode from 'hdkey';
-import {CoinDefines, CoinCode, AccountImplMapping} from './coins';
-
-// eslint-disable-next-line require-jsdoc
-export abstract class Account {
-  // eslint-disable-next-line require-jsdoc
-  constructor(
-    readonly _privateKey: Buffer,
-  ) {
-  }
-
-  // eslint-disable-next-line require-jsdoc
-  get privateKey(): Buffer {
-    return this._privateKey;
-  }
-
-  abstract get publicKey(): string;
-
-  abstract get address(): string;
-}
-
+import {CoinCode} from '../defines';
+import {AccountImplMapping, CoinDefines} from './coins/defines';
 
 export interface CoinWalletJSON<C extends CoinCode> {
   coinType: C,
