@@ -4,21 +4,23 @@
  */
 
 import { ipcMain } from 'electron'
-import { AccountData, TxInfo } from './Types'
+import { AccountData, TxInfo } from '../Types'
 import { v4 as uuidv4 } from 'uuid'
 import './RedisShared.ts'
+import { CoinTFC } from '../Const'
 
 const demoData: AccountData[] = [
     {
         accountName: 'TFC Account',
-        accountType: 'tfc',
+        accountType: 'plain',
+        coinType: CoinTFC,
         accountBalance: 1000n,
         accountId: uuidv4(),
         passPhrase: ['some', 'array'],
         privKey: 'privKey',
         pubKey: 'pubKey'
     }, {
-        accountType: 'bip44',
+        accountType: 'bip44-master',
         accountName: 'BIP-44 Account',
         accountId: uuidv4(),
         passPhrase: ['some', 'array'],
@@ -27,7 +29,7 @@ const demoData: AccountData[] = [
         subAccounts: [
             {
                 accountName: 'BTC Account',
-                accountType: 'btc',
+                accountType: 'bip44-coin-type',
                 accountBalance: 5000n,
                 accountId: uuidv4(),
                 passPhrase: ['some', 'array'],
@@ -36,7 +38,7 @@ const demoData: AccountData[] = [
             },
             {
                 accountName: 'ETH Account',
-                accountType: 'eth',
+                accountType: 'bip44-coin-type',
                 accountBalance: 5000n,
                 accountId: uuidv4(),
                 passPhrase: ['some', 'array'],

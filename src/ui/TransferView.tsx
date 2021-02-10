@@ -1,5 +1,5 @@
 import { Dialog } from "@material-ui/core";
-import { AccountData } from "../app/Types";
+import { AccountData } from "./../Types";
 
 interface TransferViewProps {
     visible: boolean

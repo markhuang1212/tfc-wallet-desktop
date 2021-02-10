@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { AccountData } from "./Types";
+import { AccountData } from "./../Types";
 import AccountListItem from "./AccountListItem";
 import { Divider, makeStyles, Toolbar, Typography, Button, List, Box } from "@material-ui/core";
-import { getThemeProps } from "@material-ui/styles";
 
 const useStyles = makeStyles(theme => ({
 
@@ -36,10 +35,8 @@ function AccountListView(props: AccountListViewProps) {
         {props.accounts.map((account, i) =>
           <AccountListItem
             key={account.accountId}
-            accountName={account.accountName}
-            accountType={account.accountType}
+            account={account}
             isFocused={focusedItemIndex === i}
-            subAccounts={account.subAccounts}
             onClick={(subIndex) => { setFocusedItemIndex(i); props.onSelectAccount(i, subIndex) }} />
         )}
       </List>

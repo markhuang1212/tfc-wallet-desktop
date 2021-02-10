@@ -1,4 +1,4 @@
-import { AccountData } from "./Types";
+import { AccountData } from "./../Types";
 import { AppBar, Button, Container, IconButton, InputAdornment, TextField, Toolbar, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport,Check } from '@material-ui/icons'
@@ -45,7 +45,7 @@ function AccountDetailView(props: AccountDetailViewProps) {
       <Container maxWidth="sm">
         {props.account ?
           <div className={classes.content}>
-            <div style={{ display: props.account?.accountType === 'bip44' ? 'none' : 'block', marginTop: '24px' }}>
+            <div style={{ display: props.account?.accountType === 'plain' ? 'block' : 'none', marginTop: '24px' }}>
               <Typography variant="subtitle1">Balance</Typography>
               <Typography variant="h2">{props.account?.accountBalance?.toString()}</Typography>
             </div>

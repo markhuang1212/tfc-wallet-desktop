@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactDom from 'react-dom';
-import { AccountData } from './Types';
+import { AccountData } from './../Types';
 import AccountDetailView from './AccountDetailView';
 import AccountListView from './AccountListView';
 import ImportAccountView from './ImportAccountVIew';
@@ -13,7 +13,10 @@ function App() {
   const [accountDetailData, setAccountDetailData] = useState<AccountData | undefined>(undefined)
 
   useEffect(() => {
-    ipcRenderer.invoke('get-accounts').then(accountData => setAccountData(accountData))
+    ipcRenderer.invoke('get-accounts').then(accountData => {
+      console.log(accountData)
+      setAccountData(accountData)
+    })
   })
 
   const onSelectAccount = (index: number, subIndex?: number) => {
