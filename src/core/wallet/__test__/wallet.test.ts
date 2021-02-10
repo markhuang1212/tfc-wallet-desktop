@@ -1,6 +1,6 @@
 import {Wallet} from '../wallet';
 import * as bip39 from 'bip39';
-import {CoinTypes} from '../coins';
+import {CoinCode} from '../coins';
 
 describe('wallet', () => {
   test('should generate correct ETH address', () => {
@@ -19,7 +19,7 @@ describe('wallet', () => {
       '6370fd033278c143179d81c5526140625662b8daa446c22ee2d73db3707e620c',
     ];
     for (let i = 0; i < addresses.length; i++) {
-      const account = wallet.coinWallets[CoinTypes.ETH]
+      const account = wallet.coinWallets[CoinCode.ETH]
           .deriveHDAccount(`M/0\'/0/${i}`);
       expect(account.privateKey.toString('hex')).toEqual(privateKeys[i]);
       expect(account.address).toEqual(addresses[i]);
@@ -31,12 +31,12 @@ describe('wallet', () => {
     const privateKey =
       '4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d';
     const address = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1';
-    wallet.getCoinWallet(CoinTypes.ETH)
+    wallet.getCoinWallet(CoinCode.ETH)
         ?.addStandaloneAccounts(Buffer.from(privateKey, 'hex'));
-    const acc = wallet.getCoinWallet(CoinTypes.ETH)
+    const acc = wallet.getCoinWallet(CoinCode.ETH)
         ?.getStandaloneAccount(0);
     expect(acc?.address).toEqual(address);
-    expect(wallet.getCoinWallet(CoinTypes.ETH)?.standaloneAccounts)
+    expect(wallet.getCoinWallet(CoinCode.ETH)?.standaloneAccounts)
         .toHaveLength(1);
   });
 
@@ -45,12 +45,12 @@ describe('wallet', () => {
     const privateKey =
       '4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d';
     const address = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1';
-    wallet.getCoinWallet(CoinTypes.ETH)
+    wallet.getCoinWallet(CoinCode.ETH)
         ?.addStandaloneAccounts(Buffer.from(privateKey, 'hex'));
     const json = wallet.toJSON();
     const recoveredWallet = Wallet.fromJSON(json);
     expect(recoveredWallet).not.toBeUndefined();
-    expect(wallet.getCoinWallet(CoinTypes.ETH)
+    expect(wallet.getCoinWallet(CoinCode.ETH)
         ?.getStandaloneAccount(0)
         ?.address,
     ).toEqual(address);

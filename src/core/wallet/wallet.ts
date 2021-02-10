@@ -1,43 +1,45 @@
 import HDNode from 'hdkey';
 import {HDWallet} from './bip32';
 import {
-  CoinDefines, CoinTypes,
+  CoinDefines, CoinCode,
 } from './coins';
-import {Account, CoinWallet, CoinWalletJSON} from './coin-wallet';
+import {CoinWallet, CoinWalletJSON} from './coin-wallet';
 
 
 export interface WalletJSON {
   seed: string,
   coinWallets: {
-    [coinIndex: number]: CoinWalletJSON,
+    [C in CoinCode]: CoinWalletJSON<C>
   }
 }
 
 
 // eslint-disable-next-line require-jsdoc
 export class Wallet extends HDWallet {
-  readonly coinWallets: Record<number, CoinWallet<Account>> = {};
+  // @ts-ignore
+  readonly coinWallets: {[C in CoinCode]: CoinWallet<C>} = {};
 
   // eslint-disable-next-line require-jsdoc
   constructor(
     public readonly seed: Buffer,
-    coinWallets: {[coinIndex: number]: CoinWalletJSON} = {},
+    coinWallets: { [C in CoinCode]?: CoinWalletJSON<C> } = {},
   ) {
     super(HDNode.fromMasterSeed(seed).derive('m/44\''));
-    for (const coinName in CoinTypes) {
-      if (!CoinTypes.hasOwnProperty(coinName)) {
+    for (const coinName in CoinCode) {
+      if (!CoinCode.hasOwnProperty(coinName)) {
         continue;
       }
-      // @ts-ignore
-      const coinType = CoinTypes[coinName];
+      const coinType = CoinCode[coinName] as unknown as CoinCode;
       if (!CoinDefines.hasOwnProperty(coinType)) {
         continue;
       }
       const wallet = CoinWallet.fromJSON(coinWallets[coinType]);
       if (wallet) {
-        this.coinWallets[coinType] = wallet;
+        // @ts-ignore
+        this.coinWallets[coinType] = wallet as CoinWallet<typeof coinType>;
       } else {
-        this.coinWallets[coinType] = new CoinWallet(
+        // @ts-ignore
+        this.coinWallets[coinType] = new CoinWallet<typeof coinType>(
             this.hdNode.derive(`m/${coinType}'`),
             coinType,
         );
@@ -46,8 +48,9 @@ export class Wallet extends HDWallet {
   }
 
   // eslint-disable-next-line require-jsdoc
-  getCoinWallet(coinType: number): CoinWallet<Account> | undefined {
-    return this.coinWallets[coinType];
+  getCoinWallet<C extends CoinCode>(coinType: C)
+    : CoinWallet<C> {
+    return this.coinWallets[coinType] as unknown as CoinWallet<C>;
   }
 
   // eslint-disable-next-line require-jsdoc
@@ -62,11 +65,13 @@ export class Wallet extends HDWallet {
 
   // eslint-disable-next-line require-jsdoc
   toJSON(): WalletJSON {
-    const obj: {[coinIndex: number]: CoinWalletJSON} = {};
+    // @ts-ignore
+    const obj: { [C in CoinCode]: CoinWalletJSON<C> } = {};
     for (const coinIndex in this.coinWallets) {
       if (!this.coinWallets.hasOwnProperty(coinIndex)) {
         continue;
       }
+      // @ts-ignore
       obj[coinIndex] = this.coinWallets[coinIndex].toJSON();
     }
     return {

@@ -1,3 +1,5 @@
 import {EthAccount} from './eth';
 
-export const TfcAccount = EthAccount;
+// eslint-disable-next-line require-jsdoc
+export class TfcAccount extends EthAccount {
+}

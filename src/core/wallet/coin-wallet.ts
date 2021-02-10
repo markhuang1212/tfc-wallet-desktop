@@ -1,7 +1,7 @@
 
 import {HDWallet} from './bip32';
 import HDNode from 'hdkey';
-import {CoinDefines} from './coins';
+import {CoinDefines, CoinCode, AccountImplMapping} from './coins';
 
 // eslint-disable-next-line require-jsdoc
 export abstract class Account {
@@ -22,8 +22,8 @@ export abstract class Account {
 }
 
 
-export interface CoinWalletJSON {
-  coinType: number,
+export interface CoinWalletJSON<C extends CoinCode> {
+  coinType: C,
   hdNode: {
     xpriv: string;
     xpub: string
@@ -32,13 +32,13 @@ export interface CoinWalletJSON {
 }
 
 // eslint-disable-next-line require-jsdoc
-export class CoinWallet<AccountT extends Account> extends HDWallet {
+export class CoinWallet<C extends CoinCode> extends HDWallet {
   private readonly standalonePrivateKeys: Buffer[];
 
   // eslint-disable-next-line require-jsdoc
   constructor(
     public readonly hdNode: HDNode,
-    public readonly coinType: number,
+    public readonly coinCode: C,
     ...standalonePrivateKeys: Buffer[]
   ) {
     super(hdNode);
@@ -47,14 +47,15 @@ export class CoinWallet<AccountT extends Account> extends HDWallet {
 
   /* The method that defines the keyPair strategy for each coin */
   // eslint-disable-next-line require-jsdoc
-  privateKeyToAccount(privateKey: Buffer): AccountT {
-    return new CoinDefines[this.coinType].AccountImpl(privateKey) as AccountT;
+  privateKeyToAccount(privateKey: Buffer): AccountImplMapping[C] {
+    return new CoinDefines[this.coinCode]
+        .AccountImpl(privateKey) as AccountImplMapping[C];
   }
 
   /* Standalone account methods*/
 
   // eslint-disable-next-line require-jsdoc
-  getStandaloneAccount(index: number): AccountT | undefined {
+  getStandaloneAccount(index: number): AccountImplMapping[C] | undefined {
     const privateKey = this.standalonePrivateKeys[index];
     if (!privateKey) {
       return undefined;
@@ -63,13 +64,15 @@ export class CoinWallet<AccountT extends Account> extends HDWallet {
   }
 
   // eslint-disable-next-line require-jsdoc
-  get standaloneAccounts(): AccountT[] {
+  get standaloneAccounts(): AccountImplMapping[C][] {
     return this.standalonePrivateKeys
         .map((k) => this.privateKeyToAccount(k));
   }
 
   // eslint-disable-next-line require-jsdoc
-  addStandaloneAccounts(...accountsOrPrivateKeys: (AccountT | Buffer)[]) {
+  addStandaloneAccounts(
+      ...accountsOrPrivateKeys: (AccountImplMapping[C] | Buffer)[]
+  ): void {
     for (const accountOrPrivateKey of accountsOrPrivateKeys) {
       if (Buffer.isBuffer(accountOrPrivateKey)) {
         this.standalonePrivateKeys.push(accountOrPrivateKey);
@@ -82,9 +85,9 @@ export class CoinWallet<AccountT extends Account> extends HDWallet {
   /* Serialization methods */
 
   // eslint-disable-next-line require-jsdoc
-  toJSON(): CoinWalletJSON {
+  toJSON(): CoinWalletJSON<C> {
     return {
-      coinType: this.coinType,
+      coinType: this.coinCode,
       hdNode: this.hdNode.toJSON(),
       standalonePrivateKeys: this.standalonePrivateKeys
           .map((k) => k.toString('hex')),
@@ -92,8 +95,8 @@ export class CoinWallet<AccountT extends Account> extends HDWallet {
   }
 
   // eslint-disable-next-line require-jsdoc
-  static fromJSON(obj: CoinWalletJSON)
-    : CoinWallet<Account> | undefined {
+  static fromJSON<C extends CoinCode>(obj: CoinWalletJSON<C> | undefined)
+    : CoinWallet<C> | undefined {
     if (!obj) {
       return undefined;
     }
@@ -101,7 +104,7 @@ export class CoinWallet<AccountT extends Account> extends HDWallet {
     const standalonePrivateKeys = obj['standalonePrivateKeys'];
     const coinType = obj['coinType'];
     if (Array.isArray(standalonePrivateKeys)) {
-      return new CoinWallet<Account>(
+      return new CoinWallet<C>(
           hdNode,
           coinType,
           ...standalonePrivateKeys.map((k) => Buffer.from(k, 'hex')),
@@ -114,13 +117,13 @@ export class CoinWallet<AccountT extends Account> extends HDWallet {
   /* convenient methods */
 
   // eslint-disable-next-line require-jsdoc
-  deriveHDAccount(bip32Path: string): AccountT {
+  deriveHDAccount(bip32Path: string): AccountImplMapping[C] {
     const node = this.deriveBip32Path(bip32Path);
     return this.privateKeyToAccount(node.privateKey);
   }
 
   // eslint-disable-next-line require-jsdoc
-  getBip44Account(index: number): AccountT {
+  getBip44Account(index: number): AccountImplMapping[C] {
     return this.deriveHDAccount(`m/0'/0/${index}`);
   }
 }
