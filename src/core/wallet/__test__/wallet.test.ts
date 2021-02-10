@@ -40,7 +40,7 @@ describe('wallet', () => {
         .toHaveLength(1);
   });
 
-  test('should serialize & deserialize accounts', ()=>{
+  test('should serialize & deserialize accounts', () => {
     const wallet = new Wallet(Buffer.from('1234', 'hex'));
     const privateKey =
       '4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d';
@@ -54,5 +54,41 @@ describe('wallet', () => {
         ?.getStandaloneAccount(0)
         ?.address,
     ).toEqual(address);
+  });
+
+  test('should check valid bip32 path', () => {
+    let path = 'abcdefdskjf';
+    expect(Wallet.isValidBip32Path(path)).toBeFalsy();
+    path = '0/1/2/3';
+    expect(Wallet.isValidBip32Path(path)).toBeFalsy();
+    path = 'm/0/1/2/3';
+    expect(Wallet.isValidBip32Path(path)).toBeTruthy();
+    path = 'm/0\'/1\'/2\'/3/';
+    expect(Wallet.isValidBip32Path(path)).toBeTruthy();
+  });
+
+  test('should get coin code from bip44 path', () => {
+    let path = 'm/44\'/0/1/2';
+    expect(() => Wallet.getCoinCodeFromBip44Path(path)).toThrow('is not valid');
+    path = 'm/44\'/0\'/0/0';
+    expect(Wallet.getCoinCodeFromBip44Path(path)).toBe(CoinCode.BTC);
+    path = 'm/44\'/999\'/0';
+    expect(() => Wallet.getCoinCodeFromBip44Path(path))
+        .toThrow('not supported');
+  });
+
+  test('should get account from static methods', ()=>{
+    const mnemonic = 'myth like bonus scare over problem client ' +
+      'lizard pioneer submit female collect';
+    const seed = bip39.mnemonicToSeedSync(mnemonic);
+    const wallet = new Wallet(seed);
+    const acc0 = wallet.getCoinWallet(CoinCode.BTC).getBip44Account(0);
+    const bip44Path = 'm/44\'/0\'/0\'/0/0';
+    expect(Wallet.getAccount(mnemonic, bip44Path).address)
+        .toEqual(acc0.address);
+    expect(Wallet.getAccount(seed, bip44Path).address)
+        .toEqual(acc0.address);
+    expect(Wallet.getAccount(seed.toString('hex'), CoinCode.BTC, 'm/0\'/0/0').address)
+        .toEqual(acc0.address);
   });
 });

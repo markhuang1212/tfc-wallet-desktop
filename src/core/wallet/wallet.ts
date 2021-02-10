@@ -1,10 +1,10 @@
 import HDNode from 'hdkey';
 import {HDWallet} from './bip32';
-import {
-  CoinDefines, CoinCode,
-} from './coins';
-import {CoinWallet, CoinWalletJSON} from './coin-wallet';
+import {AccountImplMapping, CoinCode, CoinDefines} from './coins';
+import {Account, CoinWallet, CoinWalletJSON} from './coin-wallet';
+import * as bip39 from 'bip39';
 
+type Bytes = string | Buffer;
 
 export interface WalletJSON {
   seed: string,
@@ -17,7 +17,7 @@ export interface WalletJSON {
 // eslint-disable-next-line require-jsdoc
 export class Wallet extends HDWallet {
   // @ts-ignore
-  readonly coinWallets: {[C in CoinCode]: CoinWallet<C>} = {};
+  readonly coinWallets: { [C in CoinCode]: CoinWallet<C> } = {};
 
   // eslint-disable-next-line require-jsdoc
   constructor(
@@ -54,16 +54,6 @@ export class Wallet extends HDWallet {
   }
 
   // eslint-disable-next-line require-jsdoc
-  isValidBip44Path(path: string): boolean {
-    try {
-      this.hdNode.derive(path);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  // eslint-disable-next-line require-jsdoc
   toJSON(): WalletJSON {
     // @ts-ignore
     const obj: { [C in CoinCode]: CoinWalletJSON<C> } = {};
@@ -86,6 +76,99 @@ export class Wallet extends HDWallet {
       return undefined;
     }
     return new Wallet(Buffer.from(obj.seed, 'hex'), obj.coinWallets);
+  }
+
+  /* Convenient static methods */
+  getAccount(bip44Path: string): Account;
+
+  getAccount<C extends CoinCode>(coinCode: C): AccountImplMapping[C];
+
+  getAccount<C extends CoinCode>(coinCode: C, bip32Path: string)
+    : AccountImplMapping[C];
+
+  // eslint-disable-next-line require-jsdoc
+  getAccount(...args: any[]): Account {
+    if (args.length < 1) {
+      throw new Error('account derive path is not specified');
+    }
+    let coinWallet: CoinWallet<CoinCode>;
+    if (args.length >= 1) {
+      const arg0 = args[0];
+      if (typeof arg0 === 'string') {
+        const coinCode = Wallet.getCoinCodeFromBip44Path(arg0);
+        coinWallet = this.getCoinWallet(coinCode);
+      } else {
+        coinWallet = this.getCoinWallet(arg0 as CoinCode);
+      }
+    }
+
+    if (args.length >= 2) {
+      const arg1 = args[1];
+      return coinWallet!.deriveHDAccount(arg1);
+    } else {
+      return coinWallet!.getBip44Account(0);
+    }
+  }
+
+
+  static getAccount(seed: Bytes, bip44Path: string): Account;
+
+  static getAccount<C extends CoinCode>
+  (seed: Bytes, coinCode: C, bip32Path: string)
+    : AccountImplMapping[C];
+
+  // eslint-disable-next-line require-jsdoc
+  static getAccount(seed: Bytes, ...args: any[]): Account {
+    let s: Buffer;
+    if (typeof seed === 'string') {
+      seed = seed.trim();
+      const hexRegex = /^([0-9A-Fa-f][0-9A-Fa-f])+$/g;
+      if (hexRegex.test(seed)) {
+        s = Buffer.from(seed, 'hex');
+      } else {
+        s = Wallet.mnemonicToPrivateKey(seed);
+      }
+    } else if (Buffer.isBuffer(seed)) {
+      s = seed;
+    } else {
+      throw new Error('seed is not hex string or buffer');
+    }
+    const wallet = new Wallet(s);
+    // @ts-ignore
+    return wallet.getAccount(...args);
+  }
+
+
+  /* Static helper methods */
+
+  // eslint-disable-next-line require-jsdoc
+  static isValidBip32Path(path: string): boolean {
+    const testRegex = /^m(\/[0-9]+'?)+\/?$/;
+    return testRegex.test(path.trim());
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  static getCoinCodeFromBip44Path(bip44Path: string): CoinCode {
+    const testRegex = /^m\/44'\/([0-9]+)'(\/[0-9]+'?)+\/?$/;
+    const matches = bip44Path.trim().match(testRegex);
+    if (!matches) {
+      throw new Error(bip44Path + ' is not valid bip44 path');
+    }
+    let coinCode;
+    try {
+      coinCode = parseInt(matches[1]);
+    } catch (e) {
+      throw new Error(bip44Path + 'is not valid bip44 path: ' + e.message);
+    }
+    if (!(coinCode in CoinCode)) {
+      throw new Error(`coin code '${coinCode}' is not supported`);
+    }
+    return coinCode as CoinCode;
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  static mnemonicToPrivateKey(mnemonic: string): Buffer {
+    return bip39.mnemonicToSeedSync(mnemonic);
   }
 }
 
