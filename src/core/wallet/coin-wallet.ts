@@ -52,11 +52,15 @@ export class CoinWallet<C extends CoinCode> extends HDWallet {
 
   // eslint-disable-next-line require-jsdoc
   addStandaloneAccounts(
-      ...accountsOrPrivateKeys: (AccountImplMapping[C] | Buffer)[]
+      ...accountsOrPrivateKeys: (AccountImplMapping[C] | Buffer | string)[]
   ): void {
     for (const accountOrPrivateKey of accountsOrPrivateKeys) {
       if (Buffer.isBuffer(accountOrPrivateKey)) {
         this.standalonePrivateKeys.push(accountOrPrivateKey);
+      } else if (typeof accountOrPrivateKey === 'string') {
+        this.standalonePrivateKeys.push(
+            Buffer.from(accountOrPrivateKey, 'hex'),
+        );
       } else {
         this.standalonePrivateKeys.push(accountOrPrivateKey.privateKey);
       }

@@ -15,3 +15,7 @@ A crypto-currency wallet that supports TFC-ERC20, ETH, USDT, BTC, and more.
 ## Deployment
 
 * run `npm run make`. The output executable will be at `./out`
+
+## Core Usage
+
+There are some examples in [`src/core/__test__/example.test.ts`](./src/core/__test__/example.test.ts);

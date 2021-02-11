@@ -81,6 +81,34 @@ export class Wallet extends HDWallet {
   }
 
   /* Convenient static methods */
+  // eslint-disable-next-line require-jsdoc
+  static fromMnemonic(mnemonic: string): Wallet {
+    const privateKey = Wallet.mnemonicToPrivateKey(mnemonic);
+    return new Wallet(privateKey);
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  static fromSeed(seed: Bytes): Wallet {
+    let s: Buffer;
+    if (typeof seed === 'string') {
+      seed = seed.trim();
+      if (seed.startsWith('0x')) {
+        seed = seed.slice(2);
+      }
+      const hexRegex = /^([0-9A-Fa-f][0-9A-Fa-f])+$/g;
+      if (hexRegex.test(seed)) {
+        s = Buffer.from(seed, 'hex');
+      } else {
+        s = Wallet.mnemonicToPrivateKey(seed);
+      }
+    } else if (Buffer.isBuffer(seed)) {
+      s = seed;
+    } else {
+      throw new Error('seed is not hex string or buffer');
+    }
+    return new Wallet(s);
+  }
+
   getAccount(bip44Path: string): Account;
 
   getAccount<C extends CoinCode>(coinCode: C): AccountImplMapping[C];
@@ -121,21 +149,7 @@ export class Wallet extends HDWallet {
 
   // eslint-disable-next-line require-jsdoc
   static getAccount(seed: Bytes, ...args: any[]): Account {
-    let s: Buffer;
-    if (typeof seed === 'string') {
-      seed = seed.trim();
-      const hexRegex = /^([0-9A-Fa-f][0-9A-Fa-f])+$/g;
-      if (hexRegex.test(seed)) {
-        s = Buffer.from(seed, 'hex');
-      } else {
-        s = Wallet.mnemonicToPrivateKey(seed);
-      }
-    } else if (Buffer.isBuffer(seed)) {
-      s = seed;
-    } else {
-      throw new Error('seed is not hex string or buffer');
-    }
-    const wallet = new Wallet(s);
+    const wallet = Wallet.fromSeed(seed);
     // @ts-ignore
     return wallet.getAccount(...args);
   }
