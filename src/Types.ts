@@ -14,6 +14,20 @@ interface Coin {
     identifier: number
 }
 
+interface AccountDataStorage {
+    accountName: string,
+    accountType: 'bip44-master' | 'bip44-coin-type' | 'plain',
+
+    accountBalance?: string
+    coin: 'eth' | 'btc' | 'tfc' | 'usdt' // for non bip-44 account
+
+    accountPath?: string // for bip44 sub-accounts
+    subAccounts?: string
+
+    privKey: string
+    pubKey: string
+}
+
 interface AccountData {
     accountId: string, // the unique id for all accounts
     accountName: string,

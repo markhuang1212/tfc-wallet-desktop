@@ -7,7 +7,7 @@ import { ipcMain } from 'electron'
 import { AccountData, TxInfo } from '../Types'
 import { v4 as uuidv4 } from 'uuid'
 import './RedisShared.ts'
-import { CoinTFC } from '../Const'
+import { CoinBTC, CoinETH, CoinTFC } from '../Const'
 
 const demoData: AccountData[] = [
     {
@@ -30,16 +30,18 @@ const demoData: AccountData[] = [
             {
                 accountName: 'BTC Account',
                 accountType: 'bip44-coin-type',
+                coinType: CoinBTC,
                 accountBalance: 5000n,
                 accountId: uuidv4(),
                 passPhrase: ['some', 'array'],
                 privKey: 'privKey',
-                pubKey: 'pubKey'
+                pubKey: 'pubKey',
             },
             {
                 accountName: 'ETH Account',
                 accountType: 'bip44-coin-type',
                 accountBalance: 5000n,
+                coinType: CoinETH,
                 accountId: uuidv4(),
                 passPhrase: ['some', 'array'],
                 privKey: 'privKey',
@@ -49,6 +51,10 @@ const demoData: AccountData[] = [
     }
 ]
 
+function getAccounts(): AccountData[] {
+    return []
+}
+
 ipcMain.handle('get-accounts', async () => {
     return demoData
 })
@@ -57,7 +63,15 @@ ipcMain.handle('rename-account', async (event, accountId: string, newName: strin
     return true
 })
 
-ipcMain.handle('add-account', async (event, accountData: AccountData) => {
+ipcMain.handle('create-plain-account', async (event, privKey: string | string[]) => {
+
+})
+
+ipcMain.handle('create-bip44-account', async (event, privKey: string | string[]) => {
+
+})
+
+ipcMain.handle('create-bip44-sub-account', async (event, masterId: string, path: string) => {
 
 })
 

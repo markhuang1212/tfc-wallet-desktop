@@ -30,7 +30,7 @@ function AccountListItem(props: AccountListItemProps) {
             key={account.accountId}
             onClick={() => { setSubAccountIndex(i); props.onClick(i) }}
             selected={props.isFocused && subAccountIndex === i}>
-            <ListItemText primary={account.accountName} secondary={account.coinType} />
+            <ListItemText primary={account.accountName} secondary={account.coinType?.abbrName} />
           </ListItem>
         ))
       }

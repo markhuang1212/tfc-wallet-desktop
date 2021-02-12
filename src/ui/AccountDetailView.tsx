@@ -1,7 +1,7 @@
 import { AccountData } from "./../Types";
 import { AppBar, Button, Container, IconButton, InputAdornment, TextField, Toolbar, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import { ImportExport,Check } from '@material-ui/icons'
+import { ImportExport, Check } from '@material-ui/icons'
 import { useEffect, useState } from "react";
 
 const useStyle = makeStyles({
@@ -17,6 +17,18 @@ const useStyle = makeStyles({
 interface AccountDetailViewProps {
   account?: AccountData
   onRename?: (newName: string) => {}
+}
+
+function Bip44MasterAccountDetailViewContent(props: AccountDetailViewProps) {
+  return null
+}
+
+function Bip44CoinAccountDetailViewContent(props: AccountDetailViewProps) {
+  return null
+}
+
+function PlainAccountDetailViewContent(props: AccountDetailViewProps) {
+  return null
 }
 
 function AccountDetailView(props: AccountDetailViewProps) {
