@@ -5,7 +5,6 @@ A crypto-currency wallet that supports TFC-ERC20, ETH, USDT, BTC, and more.
 ## Installation
 
 * run `npm i` to install dependency.
-* put the `redis-server` executable file to `./bin`. `redis-server` needs to be built from https://redis.io/download
 
 ## Development
 
