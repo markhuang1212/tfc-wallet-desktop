@@ -1,4 +1,4 @@
-import {Chain, TransactionID} from '../chain';
+import {Chain, TxEvents, TypedEventEmitter} from '../chain';
 import {CoinCode} from '../../defines';
 import {AccountImplMapping} from '../../wallet/coins/defines';
 
@@ -11,11 +11,11 @@ export class VsysChain extends Chain<CoinCode.VSYS> {
   }
 
   // eslint-disable-next-line require-jsdoc
-  async transfer(
+  transfer(
       recipient: string | AccountImplMapping[CoinCode.VSYS],
       amount: BigInt,
       sender: AccountImplMapping[CoinCode.VSYS],
-  ): Promise<TransactionID> {
-    return Promise.reject(new Error('unimplemented'));
+  ): TypedEventEmitter<TxEvents> {
+    return new TypedEventEmitter<TxEvents>();
   }
 }

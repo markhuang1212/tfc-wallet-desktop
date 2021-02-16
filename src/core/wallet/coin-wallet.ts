@@ -54,10 +54,14 @@ export class CoinWallet<C extends CoinCode> extends HDWallet {
   addStandaloneAccounts(
       ...accountsOrPrivateKeys: (AccountImplMapping[C] | Buffer | string)[]
   ): void {
-    for (const accountOrPrivateKey of accountsOrPrivateKeys) {
+    for (let accountOrPrivateKey of accountsOrPrivateKeys) {
       if (Buffer.isBuffer(accountOrPrivateKey)) {
         this.standalonePrivateKeys.push(accountOrPrivateKey);
       } else if (typeof accountOrPrivateKey === 'string') {
+        accountOrPrivateKey = accountOrPrivateKey.trim();
+        if (accountOrPrivateKey.startsWith('0x')) {
+          accountOrPrivateKey = accountOrPrivateKey.slice(2);
+        }
         this.standalonePrivateKeys.push(
             Buffer.from(accountOrPrivateKey, 'hex'),
         );
