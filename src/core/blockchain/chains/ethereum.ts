@@ -1,9 +1,10 @@
-import {Chain, TxEvents, TypedEventEmitter} from '../chain';
+import {Chain, TransactionID, TxEvents} from '../chain';
 import {CoinCode} from '../../defines';
 import BN from 'bn.js';
 import {AccountImplMapping} from '../../wallet/coins/defines';
 import Web3 from 'web3';
 import SDK from 'jasmine-eth-ts';
+import {PromiEvent} from '@troubkit/tools';
 
 // eslint-disable-next-line require-jsdoc
 export class EthereumChain extends Chain<CoinCode.ETH> {
@@ -19,7 +20,9 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
 
   // eslint-disable-next-line require-jsdoc
   private feedTxEvents(
-      eventEmitter: TypedEventEmitter<TxEvents>,
+      eventEmitter: PromiEvent<TransactionID, TxEvents>,
+      resolve: (value: TransactionID | PromiseLike<TransactionID>) => void,
+      reject: (reason?: unknown) => void,
       signedTx: string,
   ) {
     this.web3.eth
@@ -31,15 +34,18 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
           eventEmitter.emit('executed', receipt.transactionHash);
           if (this.confirmationRequirement == 0) {
             eventEmitter.emit('finalized', receipt.transactionHash);
+            resolve(receipt.transactionHash);
           }
         })
         .on('confirmation', (confirmationNumber, receipt)=>{
           if (confirmationNumber === this.confirmationRequirement) {
             eventEmitter.emit('finalized', receipt.transactionHash);
+            resolve(receipt.transactionHash);
           }
         })
         .on('error', (e) => {
           eventEmitter.emit('error', e);
+          reject(e);
         });
   }
 
@@ -61,8 +67,8 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
       recipient: string | AccountImplMapping[CoinCode.ETH],
       amount: BigInt,
       sender: AccountImplMapping[CoinCode.ETH],
-  ): TypedEventEmitter<TxEvents> {
-    let addr;
+  ): PromiEvent<TransactionID, TxEvents> {
+    let addr: string;
     if (typeof recipient === 'string') {
       addr = recipient;
     } else {
@@ -75,15 +81,22 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
       value: new BN(amount.toString(10)),
       from: sender.address,
     };
-    const emitter = new TypedEventEmitter<TxEvents>();
-    this.jasmineSDK.signSimpleTransaction(
-        tx,
-        addr,
-        {from: sdkSender.web3Account},
-    ).then((signedTx) => {
-      this.feedTxEvents(emitter, signedTx.rawTransaction as string);
-    });
-    return emitter;
+    return new PromiEvent<TransactionID, TxEvents>(
+        (resolve, reject, emitter) => {
+          this.jasmineSDK.signSimpleTransaction(
+              tx,
+              addr,
+              {from: sdkSender.web3Account},
+          ).then((signedTx) => {
+            this.feedTxEvents(
+                emitter,
+                resolve,
+                reject,
+                signedTx.rawTransaction as string,
+            );
+          });
+        },
+    );
   }
 
   // eslint-disable-next-line require-jsdoc
@@ -109,7 +122,7 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
       recipient: string | AccountImplMapping[CoinCode.ETH],
       amount: BigInt,
       sender: AccountImplMapping[CoinCode.ETH],
-  ): TypedEventEmitter<TxEvents> {
+  ): PromiEvent<TransactionID, TxEvents> {
     const abi = require('erc-20-abi');
     const token = new this.web3.eth.Contract(abi, erc20Address);
     let addr;
@@ -121,14 +134,21 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
     const tx = token.methods.transfer(addr, amount.toString(10));
     const sdkSender = this.jasmineSDK
         .retrieveAccount(sender.privateKey.toString('hex'));
-    const emitter = new TypedEventEmitter<TxEvents>();
-    this.jasmineSDK.signContractTransaction(
-        tx,
-        erc20Address,
-        {from: sdkSender.web3Account},
-    ).then((signedTx) => {
-      this.feedTxEvents(emitter, signedTx.rawTransaction as string);
-    });
-    return emitter;
+    return new PromiEvent<TransactionID, TxEvents>(
+        (resolve, reject, emitter) => {
+          this.jasmineSDK.signContractTransaction(
+              tx,
+              erc20Address,
+              {from: sdkSender.web3Account},
+          ).then((signedTx) => {
+            this.feedTxEvents(
+                emitter,
+                resolve,
+                reject,
+          signedTx.rawTransaction as string,
+            );
+          });
+        },
+    );
   }
 }

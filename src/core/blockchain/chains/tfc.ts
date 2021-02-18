@@ -1,6 +1,7 @@
-import {Chain, TxEvents, TypedEventEmitter} from '../chain';
+import {Chain, TransactionID, TxEvents} from '../chain';
 import {CoinCode} from '../../defines';
 import {AccountImplMapping} from '../../wallet/coins/defines';
+import {PromiEvent} from '@troubkit/tools';
 
 // eslint-disable-next-line require-jsdoc
 export class TfcChain extends Chain<CoinCode.TFC> {
@@ -15,7 +16,9 @@ export class TfcChain extends Chain<CoinCode.TFC> {
       recipient: string | AccountImplMapping[CoinCode.TFC],
       amount: BigInt,
       sender: AccountImplMapping[CoinCode.TFC],
-  ): TypedEventEmitter<TxEvents> {
-    return new TypedEventEmitter<TxEvents>();
+  ): PromiEvent<TransactionID, TxEvents> {
+    return PromiEvent.reject(
+        new Error('unimplemented'),
+    ) as unknown as PromiEvent<TransactionID, TxEvents>;
   }
 }
