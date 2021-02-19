@@ -1,6 +1,6 @@
 import {CoinWallet, EthAccount, Wallet, WalletJSON} from '../wallet';
 import {CoinCode} from '../defines';
-import {EthereumChain} from '../blockchain';
+import {EthereumChain, TransferRecord} from '../blockchain';
 import {Endpoints} from '../blockchain/defines';
 import {Chain, TransactionID, TxEvents} from '../blockchain/chain';
 import {PromiEvent} from '@troubkit/tools';
@@ -187,4 +187,24 @@ describe('Examples for Blockchain', () => {
       console.log('transaction error ' + err.message);
     });
   }, 9999999);
+
+  test('Get list of ETH transfer records', async ()=>{
+    const ethChain: EthereumChain =
+      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+    const transferRecords: TransferRecord[] =
+      await ethChain.getETHTransferRecordList(
+          '0xD265C6c7487154803CdA1863A2ddeEcd76Ca2382', // account address
+      );
+    console.log(transferRecords);
+  });
+  test('Get list of ERC20 transfer records', async ()=>{
+    const ethChain: EthereumChain =
+      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+    const transferRecords: TransferRecord[] =
+      await ethChain.getErc20TransferRecordList(
+          '0x401Ef2b876Db2608e4A353800BBaD1E3e3Ea8B46', // ERC20 contract
+          '0xD265C6c7487154803CdA1863A2ddeEcd76Ca2382', // account address
+      );
+    console.log(transferRecords);
+  });
 });

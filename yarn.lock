@@ -2787,6 +2787,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^0.21.1":
+  version: 0.21.1
+  resolution: "axios@npm:0.21.1"
+  dependencies:
+    follow-redirects: ^1.10.0
+  checksum: 864fb7b5d077d236737f10adca53bf451a93f35a15271f56fba8da07265a02d26b7d881b935a6697dc6adb0549ea3e56d2eecb403edaa3bb78f6479901c10f69
+  languageName: node
+  linkType: hard
+
 "axlsign@npm:^1.0.0":
   version: 1.0.0
   resolution: "axlsign@npm:1.0.0"
@@ -7391,7 +7400,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.10.0":
   version: 1.13.2
   resolution: "follow-redirects@npm:1.13.2"
   peerDependenciesMeta:
@@ -15326,6 +15335,7 @@ resolve@~1.17.0:
     "@typescript-eslint/eslint-plugin": ^4.14.2
     "@typescript-eslint/parser": ^4.14.2
     "@virtualeconomy/js-v-sdk": ^2.0.6
+    axios: ^0.21.1
     base-58: ^0.0.1
     bip39: ^3.0.3
     bip44-constants: ^8.0.94

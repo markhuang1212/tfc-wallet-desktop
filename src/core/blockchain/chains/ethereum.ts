@@ -5,11 +5,15 @@ import {AccountImplMapping} from '../../wallet/coins/defines';
 import Web3 from 'web3';
 import SDK from 'jasmine-eth-ts';
 import {PromiEvent} from '@troubkit/tools';
+import axios from 'axios';
 
 // eslint-disable-next-line require-jsdoc
 export class EthereumChain extends Chain<CoinCode.ETH> {
   readonly web3: Web3;
   readonly jasmineSDK: SDK;
+
+  // etherscan is only available for public chain
+  etherscan: EtherscanProvider | undefined;
 
   // eslint-disable-next-line require-jsdoc
   constructor(endpoint: string) {
@@ -150,5 +154,204 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
           });
         },
     );
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  private async initializeEtherscan() {
+    if (this.etherscan) {
+      return;
+    }
+    const networkMap = {
+      1: 'https://api.etherscan.io/api',
+      4: 'https://api-rinkeby.etherscan.io/api',
+    };
+    // get networkId
+    const networkId = await this.web3.eth.net.getId();
+    if (networkId in networkMap) {
+      this.etherscan = new EtherscanProvider(
+          networkMap[networkId as 1 | 4],
+          '6FTP6N6HH43PTTJ89P9VKKKZWRMV4NH245',
+      );
+    } else {
+      throw new Error('Etherscan is not available on current network');
+    }
+  }
+
+  /**
+   * Get a list of transactions from account.
+   * Transactions are sorted from latest to earliest.
+   *
+   * @param {string | EthAccount} account the account to get transactions
+   */
+  async getETHTransferRecordList(
+      account: string | AccountImplMapping[CoinCode.ETH],
+  ): Promise<TransferRecord[]> {
+    let address: string;
+    if (typeof account === 'string') {
+      address = account;
+    } else {
+      address = account.address;
+    }
+    await this.initializeEtherscan();
+    const txs = await this.etherscan!.getListOfNormalTransactionsByAddress(
+        address,
+        BigInt(0),
+        'latest',
+        'desc',
+    );
+    return txs
+        .map((tx) => {
+          return {
+            txHash: tx.hash,
+            tokenAddress: undefined,
+            from: tx.from,
+            to: tx.to,
+            amount: BigInt(tx.value),
+            confirmations: tx.confirmations,
+          };
+        })
+        .filter((tx) => tx.amount > 0);
+  }
+
+  /**
+   * Get a list of ERC20 transactions from account.
+   * Transactions are sorted from latest to earliest.
+   *
+   * @param {string} erc20ContractAddress
+   * @param {string | EthAccount} account the account to get transactions
+   */
+  async getErc20TransferRecordList(
+      erc20ContractAddress: string,
+      account: string | AccountImplMapping[CoinCode.ETH],
+  ): Promise<TransferRecord[]> {
+    let address: string;
+    if (typeof account === 'string') {
+      address = account;
+    } else {
+      address = account.address;
+    }
+    await this.initializeEtherscan();
+    const txs = await this.etherscan!.getListOfErc20TransferEventsByAddress(
+        address,
+        BigInt(0),
+        'latest',
+        'desc',
+    );
+    return txs
+        .filter((tx) =>
+          this.web3.utils.toChecksumAddress(tx.contractAddress) ===
+          this.web3.utils.toChecksumAddress(erc20ContractAddress))
+        .map((tx) => {
+          return {
+            txHash: tx.hash,
+            tokenAddress: undefined,
+            from: tx.from,
+            to: tx.to,
+            amount: BigInt(tx.value),
+            confirmations: tx.confirmations,
+          };
+        });
+  }
+}
+
+interface EtherscanTransaction {
+  blockNumber: BigInt,
+  blockHash: string,
+  hash: string,
+  from: string,
+  to: string,
+  value: string,
+  // eslint-disable-next-line camelcase
+  txrecipient_status: boolean,
+  confirmations: number,
+  contractAddress: string,
+}
+
+export interface TransferRecord {
+  txHash: string,
+
+  // if tokenAddress is undefined, the transfer is about ETH.
+  // otherwise tokenAddress is the address of ERC20 token being transferred
+  tokenAddress: string | undefined,
+
+  from: string,
+  to: string,
+  amount: BigInt,
+
+  // the number of confirmations this transfer transaction has
+  confirmations: number,
+}
+
+// eslint-disable-next-line require-jsdoc
+class EtherscanProvider {
+  // eslint-disable-next-line require-jsdoc
+  constructor(
+    readonly url: string,
+    readonly apiKey: string,
+  ) {
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  async getListOfNormalTransactionsByAddress(
+      address: string,
+      startBlock: BigInt,
+      endBlock: BigInt | 'latest',
+      sort: 'asc' | 'desc',
+  ): Promise<EtherscanTransaction[]> {
+    const resp = await axios.get(this.url, {
+      params: {
+        apikey: this.apiKey,
+        module: 'account',
+        action: 'txlist',
+        address: address,
+        startblock: startBlock.toString(10),
+        endblock: endBlock.toString(10),
+        sort: sort,
+      },
+    });
+    if (Math.floor(resp.status / 100) !== 2) {
+      throw new Error('Etherscan API HTTP error with code ' + resp.status);
+    }
+    const data = resp.data as {
+      status: string,
+      message: string,
+      result: string | EtherscanTransaction[]
+    };
+    if (data.status !== '1') {
+      throw new Error(`${data.message}: ${data.result as string}`);
+    }
+    return data.result as EtherscanTransaction[];
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  async getListOfErc20TransferEventsByAddress(
+      address: string,
+      startBlock: BigInt,
+      endBlock: BigInt | 'latest',
+      sort: 'asc' | 'desc',
+  ): Promise<EtherscanTransaction[]> {
+    const resp = await axios.get(this.url, {
+      params: {
+        apikey: this.apiKey,
+        module: 'account',
+        action: 'tokentx',
+        address: address,
+        startblock: startBlock.toString(10),
+        endblock: endBlock.toString(10),
+        sort: sort,
+      },
+    });
+    if (Math.floor(resp.status / 100) !== 2) {
+      throw new Error('Etherscan API HTTP error with code ' + resp.status);
+    }
+    const data = resp.data as {
+      status: string,
+      message: string,
+      result: string | EtherscanTransaction[]
+    };
+    if (data.status !== '1') {
+      throw new Error(`${data.message}: ${data.result as string}`);
+    }
+    return data.result as EtherscanTransaction[];
   }
 }

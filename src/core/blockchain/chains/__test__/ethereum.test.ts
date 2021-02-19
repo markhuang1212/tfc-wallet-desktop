@@ -3,6 +3,7 @@ import {EthereumChain} from '../ethereum';
 import {EthAccount, Wallet} from '../../../wallet';
 import {CoinCode} from '../../../defines';
 import BN from 'bn.js';
+import {Endpoints} from '../../defines';
 
 describe('EthereumChain', () => {
   let mockEth: MockEthereum;
@@ -47,6 +48,19 @@ describe('EthereumChain', () => {
 describe('Ethereum ERC20', () => {
   let mockEth: MockEthereum;
   let tfcErc20: TFC;
+  const wallet = Wallet.fromMnemonic(
+      'myth like bonus scare over problem client ' +
+    'lizard pioneer submit female collect');
+  const ethWallet = wallet.getCoinWallet(CoinCode.ETH);
+  // Jasmine Test Account 1
+  ethWallet.addStandaloneAccounts(
+      '96ca1b47bd2f7b6c1a3018e6038be291c9f5ff9556e5200f677c295693a31c60',
+  );
+  // Jasmine Test Account 2
+  ethWallet.addStandaloneAccounts(
+      '1a2ea9dbd802477439749f673e890ed6e7bc95b58f2702bfb1d6c5ffdc150035',
+  );
+
   beforeEach(async () => {
     mockEth = new MockEthereum();
     // deploy TFC
@@ -88,5 +102,23 @@ describe('Ethereum ERC20', () => {
     }).on('error', (e) =>{
       throw e;
     });
+  });
+
+  test('should get ETH transfer records', async ()=>{
+    const chain = new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+    const records =
+      await chain.getETHTransferRecordList(ethWallet.getStandaloneAccount(0)!);
+    expect(records.length).toBeGreaterThan(0);
+  });
+
+  test('should get ERC20 transfer records', async ()=>{
+    const chain = new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+    const records =
+      await chain.getErc20TransferRecordList(
+          // TFC-ERC20 contract on rinkeby
+          '0x401Ef2b876Db2608e4A353800BBaD1E3e3Ea8B46',
+          ethWallet.getStandaloneAccount(1)!,
+      );
+    expect(records.length).toBeGreaterThan(0);
   });
 });
