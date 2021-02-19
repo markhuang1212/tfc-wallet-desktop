@@ -41,6 +41,22 @@ describe('Examples for wallet', () => {
     expect(acc0.address).toEqual('0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1');
   });
 
+  test('Directly get Account using BIP44', ()=>{
+    const seed = '0x12345678';
+    const bip44Path = 'm/44\'/60\'/0\'/0/0';
+    const account: EthAccount = Wallet.getAccount(seed, bip44Path);
+    console.log(account.address);
+  });
+
+  test('Directly get Account using private key', ()=>{
+    const privateKey = Buffer.from(
+        '4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
+        'hex',
+    );
+    const account: EthAccount = Wallet.getAccount(CoinCode.ETH, privateKey);
+    console.log(account.address);
+  });
+
   test('Export wallet to JSON and retrieve wallet from a JSON', () => {
     const seed = '0x12345678';
     // create a universal wallet

@@ -33,6 +33,15 @@ export class CoinWallet<C extends CoinCode> extends HDWallet {
         .AccountImpl(privateKey) as AccountImplMapping[C];
   }
 
+  // eslint-disable-next-line require-jsdoc
+  static privateKeyToAccount<C extends CoinCode>(
+      coinCode: CoinCode,
+      privateKey: Buffer,
+  ): AccountImplMapping[C] {
+    return new CoinDefines[coinCode]
+        .AccountImpl(privateKey) as AccountImplMapping[C];
+  }
+
   /* Standalone account methods*/
 
   // eslint-disable-next-line require-jsdoc

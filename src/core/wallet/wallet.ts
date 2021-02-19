@@ -81,6 +81,7 @@ export class Wallet extends HDWallet {
   }
 
   /* Convenient static methods */
+
   // eslint-disable-next-line require-jsdoc
   static fromMnemonic(mnemonic: string): Wallet {
     const privateKey = Wallet.mnemonicToPrivateKey(mnemonic);
@@ -116,6 +117,9 @@ export class Wallet extends HDWallet {
   getAccount<C extends CoinCode>(coinCode: C, bip32Path: string)
     : AccountImplMapping[C];
 
+  getAccount<C extends CoinCode>(coinCode: C, privateKey: Buffer)
+    : AccountImplMapping[C];
+
   // eslint-disable-next-line require-jsdoc
   getAccount(...args: any[]): Account {
     if (args.length < 1) {
@@ -134,12 +138,20 @@ export class Wallet extends HDWallet {
 
     if (args.length >= 2) {
       const arg1 = args[1];
-      return coinWallet!.deriveHDAccount(arg1);
+      if (typeof arg1 === 'string') {
+        return coinWallet!.deriveHDAccount(arg1);
+      } else if (Buffer.isBuffer(arg1)) {
+        return coinWallet!.privateKeyToAccount(arg1);
+      } else {
+        return coinWallet!.getBip44Account(0);
+      }
     } else {
       return coinWallet!.getBip44Account(0);
     }
   }
 
+  static getAccount<C extends CoinCode>(coinCode: C, privateKey: Buffer)
+    : AccountImplMapping[C];
 
   static getAccount(seed: Bytes, bip44Path: string): Account;
 
@@ -148,10 +160,23 @@ export class Wallet extends HDWallet {
     : AccountImplMapping[C];
 
   // eslint-disable-next-line require-jsdoc
-  static getAccount(seed: Bytes, ...args: any[]): Account {
-    const wallet = Wallet.fromSeed(seed);
-    // @ts-ignore
-    return wallet.getAccount(...args);
+  static getAccount(...args: any[]): Account | undefined {
+    if (args.length >= 1) {
+      const arg0 = args[0];
+      if (Object.values(CoinCode).includes(arg0)) {
+        if (args.length >= 2) {
+          const arg1 = args[1];
+          if (Buffer.isBuffer(arg1)) {
+            return CoinWallet.privateKeyToAccount(arg0, arg1);
+          }
+        }
+      } else {
+        const seed = args[0];
+        const wallet = Wallet.fromSeed(seed);
+        // @ts-ignore
+        return wallet.getAccount(...args.slice(1));
+      }
+    }
   }
 
 
