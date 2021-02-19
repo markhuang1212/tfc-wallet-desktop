@@ -14,50 +14,26 @@ interface Coin {
     identifier: number
 }
 
-interface AccountDataStorage {
-    accountName: string,
-    accountType: 'bip44-master' | 'bip44-coin-type' | 'plain',
-
-    accountBalance?: string
-    coin: 'eth' | 'btc' | 'tfc' | 'usdt' // for non bip-44 account
-
-    accountPath?: string // for bip44 sub-accounts
-    subAccounts?: string
-
-    privKey: string
-    pubKey: string
-}
-
 interface AccountData {
-    accountId: string, // the unique id for all accounts
-    accountName: string,
-
-    accountType: 'bip44-master' | 'bip44-coin-type' | 'plain',
-
-    accountBalance?: bigint
-    coinType?: Coin // for non bip-44 account. Possible options: CoinBTC, CoinTFC, CoinETH, CoinUSDT
-
-    accountPath?: string // for bip44 sub-accounts
-    subAccounts?: AccountData[] // for bip44 accounts
-
-    passPhrase: string[]
-    privKey: string
-    pubKey: string
-}
-
-interface AccountData_v2 {
     accountId: string, // the unique id for all accounts
     accountName: string,
 
     accountType: 'bip44-master' | 'plain',
 
-    accountBalance?: bigint
+    accountBalance?: string // balance is cached
+    txs?: TxInfo[] // txs is cached
     coinType?: Coin // for plain account. Possible options: CoinBTC, CoinTFC, CoinETH, CoinUSDT
 
     subAccounts?: {
-        derivationPath: string,
-        alias: string,
+        accountType: 'bip44-sub-account'
+        accountId: string,
+        derivationPath: string
+        accountName: string
+        accountBalance?: string
         coinType: Coin
+        txs?: TxInfo[]
+        privKey: string
+        pubKey: string
     }[] // for bip44 accounts
 
     passPhrase: string[]
@@ -65,4 +41,4 @@ interface AccountData_v2 {
     pubKey: string
 }
 
-export { AccountData_v2, AccountData, TxInfo, Coin }
+export { AccountData, TxInfo, Coin }

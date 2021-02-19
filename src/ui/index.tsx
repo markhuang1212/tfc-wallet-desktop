@@ -10,7 +10,7 @@ import '@fontsource/roboto'
 function App() {
   const [isImportingAccount, setIsImportingAccount] = useState(false)
   const [accountData, setAccountData] = useState<AccountData[]>([])
-  const [accountDetailData, setAccountDetailData] = useState<AccountData | undefined>(undefined)
+  const [accountDetailData, setAccountDetailData] = useState<AccountData | undefined | Required<AccountData>['subAccounts'][0]>(undefined)
 
   useEffect(() => {
     ipcRenderer.invoke('get-accounts').then(accountData => {

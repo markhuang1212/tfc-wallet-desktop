@@ -1,6 +1,5 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
-import { RedisServerShared } from './app/RedisShared';
 import './app/signal_handlers.ts'
 
 function createWindow() {

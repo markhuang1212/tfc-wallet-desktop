@@ -1,9 +1,7 @@
-import { privateToPublic } from "ethereumjs-util";
-import { Redis } from "ioredis";
 import { AccountData } from "../Types";
 import demo_data from './demo_data'
-import { CoinBTC, CoinETH, CoinTFC } from "../Const";
-import { v4 as uuidv4 } from 'uuid'
+import PersistentStorageController from "./PersistentStorageController";
+import v8 from 'v8'
 
 const default_wallet_id = 'main-wallet'
 
@@ -13,37 +11,55 @@ const default_wallet_id = 'main-wallet'
  */
 class WalletController {
 
+
     walletId: string
-    private accounts: AccountData[]
+    private psc: PersistentStorageController<AccountData[]>
 
-    static shared = new WalletController(default_wallet_id)
+    static shared = new WalletController(default_wallet_id, PersistentStorageController.shared as any)
 
-    async loadWallet() {
+    loadWalletSync() {
+        this.psc.loadSync()
+    }
+
+    getAccountById(id: string) {
+        const account = this.psc.getObjectCopy().find(account => account.accountId === id)
+        return v8.deserialize(v8.serialize(account)) as AccountData | undefined
+    }
+
+    addAccountToWallet(account: AccountData) {
+        if (this.psc.object)
+            this.psc.object.push(v8.deserialize(v8.serialize(account)))
+        else
+            this.psc.object = [v8.deserialize(v8.serialize(account))]
+        this.psc.saveSync()
+    }
+
+    renameAccount(accountId: string, newName: string) {
+        if (this.psc.object) {
+            const account = this.psc.object.find(account => account.accountId === accountId)
+            if (account)
+                account.accountName = newName
+        }
+    }
+
+    renameSubAccount(accountId: string, subAccountId: string, newName: string) {
 
     }
 
-    /**
-     * The following key is stored in redis (if applicable): 
-     * accountName, accountType, accountBalance, coinType, accountPath, subAccounts, privKey, pubKey
-     */
-    async loadAccountById(id: string) {
-
+    loadDemoData() {
+        this.psc.object = v8.deserialize(v8.serialize(demo_data))
+        this.psc.saveSync()
     }
 
-    async addAccountToWallet(account: AccountData) {
-
+    deleteAccount(accountId: string) {
+        if (this.psc.object) {
+            this.psc.object = this.psc.object.filter(account => account.accountId !== accountId)
+            this.psc.saveSync()
+        }
     }
 
-    async renameAccount(accountId: string, newName: string) {
+    deleteSubAccount(accountId: string, subAccountId: string) {
 
-    }
-
-    async loadDemoData() {
-        
-    }
-
-    async deleteAccount(accountId: string) {
-        
     }
 
     async transfer(accountId: string, destination: string, amount: bigint) {
@@ -55,12 +71,24 @@ class WalletController {
     }
 
     getAccounts() {
-        return this.accounts as Readonly<AccountData[]>
+        return this.psc.getObjectCopy()
     }
 
-    constructor(walletId: string) {
+    createPlainAccount() {
+
+    }
+
+    createBipAccount() {
+
+    }
+
+    createSubAccount() {
+
+    }
+
+    constructor(walletId: string, psc: PersistentStorageController<AccountData[]>) {
         this.walletId = walletId
-        this.accounts = []
+        this.psc = psc
     }
 
 }

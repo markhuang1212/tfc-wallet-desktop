@@ -15,7 +15,7 @@ const useStyle = makeStyles({
 })
 
 interface AccountDetailViewProps {
-  account?: AccountData
+  account?: AccountData | Required<AccountData>['subAccounts'][number]
   onRename?: (newName: string) => {}
 }
 
@@ -37,7 +37,9 @@ function AccountDetailView(props: AccountDetailViewProps) {
   const [accountName, setAccountName] = useState('')
 
   useEffect(() => {
-    setAccountName(props.account?.accountName ?? '')
+    if (props.account) {
+      setAccountName(props.account.accountName)
+    }
   }, [props.account])
 
   const changeAccountName = (event: any) => {

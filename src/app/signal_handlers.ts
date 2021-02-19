@@ -4,20 +4,20 @@
  */
 
 import { ipcMain } from 'electron'
-import { AccountData, TxInfo } from '../Types'
-import './RedisShared.ts'
-import demo_data from './demo_data'
-
-function getAccounts(): AccountData[] {
-    return []
-}
+import { TxInfo } from '../Types'
+import WalletController from './WalletController'
 
 ipcMain.handle('get-accounts', async () => {
-    return demo_data
+    WalletController.shared.loadDemoData()
+    return WalletController.shared.getAccounts()
 })
 
-ipcMain.handle('rename-account', async (event, accountId: string, newName: string) => {
-    return true
+ipcMain.handle('rename-account', async (_, accountId: string, newName: string) => {
+    WalletController.shared.renameAccount(accountId, newName)
+})
+
+ipcMain.handle('rename-bip44-sub-account', async (_, accountId: string, subAccountId: string, newName: string) => {
+
 })
 
 ipcMain.handle('create-plain-account', async (event, privKey: string | string[]) => {

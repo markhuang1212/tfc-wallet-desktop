@@ -7,7 +7,7 @@ const demo_data: AccountData[] = [
         accountName: 'TFC Account',
         accountType: 'plain',
         coinType: CoinTFC,
-        accountBalance: 1000n,
+        accountBalance: '1000',
         accountId: uuidv4(),
         passPhrase: ['some', 'array'],
         privKey: 'privKey',
@@ -22,21 +22,21 @@ const demo_data: AccountData[] = [
         subAccounts: [
             {
                 accountName: 'BTC Account',
-                accountType: 'bip44-coin-type',
+                accountType: 'bip44-sub-account',
                 coinType: CoinBTC,
-                accountBalance: 5000n,
+                accountBalance: '5000',
                 accountId: uuidv4(),
-                passPhrase: ['some', 'array'],
                 privKey: 'privKey',
                 pubKey: 'pubKey',
+                derivationPath: '0/0/0/0/0'
             },
             {
+                derivationPath: '0/0/0/0/0',
                 accountName: 'ETH Account',
-                accountType: 'bip44-coin-type',
-                accountBalance: 5000n,
+                accountType: 'bip44-sub-account',
+                accountBalance: '5000',
                 coinType: CoinETH,
                 accountId: uuidv4(),
-                passPhrase: ['some', 'array'],
                 privKey: 'privKey',
                 pubKey: 'pubKey'
             }
