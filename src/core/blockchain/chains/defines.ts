@@ -7,7 +7,7 @@ import {VsysChain} from './vsys';
 export type ChainImplMapping = {
   [CoinCode.BTC]: BitcoinChain,
   [CoinCode.ETH]: EthereumChain,
-  [CoinCode.TFC]: TfcChain,
+  [CoinCode.TFC_BIP44]: TfcChain,
   [CoinCode.VSYS]: VsysChain,
 }
 

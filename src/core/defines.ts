@@ -2,7 +2,8 @@
 export enum CoinCode {
   BTC = 0,
   ETH = 60,
-  TFC = 599,
+  TFC_BIP44 = 599,
+  TFC_CHAIN = 995, // not really registered
   VSYS = 360,
 }
 

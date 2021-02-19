@@ -1,7 +1,7 @@
 import {CoinCode} from '../../defines';
 import {BtcAccount} from './btc';
 import {EthAccount} from './eth';
-import {TfcAccount} from './tfc';
+import {TfcBip44Account, TfcChainAccount} from './tfc';
 import {VsysAccount} from './vsys';
 
 export interface CoinType<T extends CoinCode> {
@@ -15,7 +15,8 @@ export interface CoinType<T extends CoinCode> {
 export type AccountImplMapping = {
   [CoinCode.BTC]: BtcAccount,
   [CoinCode.ETH]: EthAccount,
-  [CoinCode.TFC]: TfcAccount,
+  [CoinCode.TFC_BIP44]: TfcBip44Account,
+  [CoinCode.TFC_CHAIN]: TfcChainAccount,
   [CoinCode.VSYS]: VsysAccount,
 }
 
@@ -39,12 +40,19 @@ export const CoinDefines: {
     name: 'Ether',
     AccountImpl: EthAccount,
   },
-  [CoinCode.TFC]: {
+  [CoinCode.TFC_BIP44]: {
     index: 599,
     hexa: '0x80000257',
     symbol: 'TFC',
     name: 'Turbo File Coin',
-    AccountImpl: TfcAccount,
+    AccountImpl: TfcBip44Account,
+  },
+  [CoinCode.TFC_CHAIN]: {
+    index: 995,
+    hexa: '0x800003e3',
+    symbol: 'TFC-Chain',
+    name: 'Turbo File Coin',
+    AccountImpl: TfcChainAccount,
   },
   [CoinCode.VSYS]: {
     index: 360,
@@ -53,4 +61,5 @@ export const CoinDefines: {
     name: 'V Systems',
     AccountImpl: VsysAccount,
   },
+
 };
