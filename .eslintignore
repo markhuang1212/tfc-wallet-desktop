@@ -131,3 +131,5 @@ gen
 src/app
 src/ui
 src/main.ts
+src/Const.ts
+src/Types.ts
