@@ -2252,6 +2252,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"abstract-leveldown@npm:~6.2.1":
+  version: 6.2.3
+  resolution: "abstract-leveldown@npm:6.2.3"
+  dependencies:
+    buffer: ^5.5.0
+    immediate: ^3.2.3
+    level-concat-iterator: ~2.0.0
+    level-supports: ~1.0.0
+    xtend: ~4.0.0
+  checksum: 193fd90d2110b63bf46aa761f18b3cb8c6e774d5b969c4b5ff8230d215b8982eac9edb8e10dcda7d9ccef361a845bcaa99e6a510d4ba7215a709b3d3ffffee8a
+  languageName: node
+  linkType: hard
+
 "accepts@npm:~1.3.4, accepts@npm:~1.3.5, accepts@npm:~1.3.7":
   version: 1.3.7
   resolution: "accepts@npm:1.3.7"
@@ -4292,9 +4305,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30000844":
-  version: 1.0.30001189
-  resolution: "caniuse-lite@npm:1.0.30001189"
-  checksum: 3ed9f449eedcd8f6ec97ea0d369c1958c363c25a89d1ad54fb0a1bcb9f3926636fd7a30078f465d7db36b39cdc40b9255b8ca684b8cbd90ef90bd37bedd213e2
+  version: 1.0.30001190
+  resolution: "caniuse-lite@npm:1.0.30001190"
+  checksum: eb8f99e65c2246645a536129966a3610786261b7b5df97f1b1303ebbc4d1944b1776e6b6dfef057b5907b713ead3a94cde5a9db87fbd6141a0219abf3daa00ed
   languageName: node
   linkType: hard
 
@@ -5856,9 +5869,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.3.47":
-  version: 1.3.669
-  resolution: "electron-to-chromium@npm:1.3.669"
-  checksum: 753a7fe35db37759bb7a099a74ecb820e435b7eae728ab423997e48381481fa60800e67f7900fcd768803e288023e0c0f6aae62d6a37a2f1e3ea289afae5910c
+  version: 1.3.671
+  resolution: "electron-to-chromium@npm:1.3.671"
+  checksum: aa61cb6e32d646c5185a49707082b74fe96a7da0e30cc870760c7ead8ffb8c0d015fc85f165f6c4cc9cd35a7dea900424bcbe1d1cf6b9f5c2152a820939352c5
   languageName: node
   linkType: hard
 
@@ -10360,6 +10373,13 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
+"level-concat-iterator@npm:~2.0.0":
+  version: 2.0.1
+  resolution: "level-concat-iterator@npm:2.0.1"
+  checksum: d5ac362a950bcf63bc19c4e8d397055c9bbd335eea2c56f7de372d38c66147d6db2430596025861d99820f890a9881aef9a192ee62b109ccf0885c0b5c5c2586
+  languageName: node
+  linkType: hard
+
 "level-errors@npm:^1.0.3":
   version: 1.1.2
   resolution: "level-errors@npm:1.1.2"
@@ -10468,6 +10488,15 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
+"level-supports@npm:~1.0.0":
+  version: 1.0.1
+  resolution: "level-supports@npm:1.0.1"
+  dependencies:
+    xtend: ^4.0.2
+  checksum: 73c845921516d38ea57d6574908e86fedbdf3a069938f14f72e221e3f9dc04adc93b0b484fc9d7591c3baab7405f33292d90250b4239a75c6afc7f37bc5b3540
+  languageName: node
+  linkType: hard
+
 "level-ws@npm:0.0.0":
   version: 0.0.0
   resolution: "level-ws@npm:0.0.0"
@@ -10486,6 +10515,18 @@ fsevents@^2.1.2:
     readable-stream: ^2.2.8
     xtend: ^4.0.1
   checksum: 43fe561e2db986124c1e0faf321fdb3e57a9cd46c91a16f393463fd4b24527b7ee5dc2172a7c1e032d934bf3e1a15a1cd80203ac3a891c2480a861bc9c9d7879
+  languageName: node
+  linkType: hard
+
+"leveldown@npm:5.6.0":
+  version: 5.6.0
+  resolution: "leveldown@npm:5.6.0"
+  dependencies:
+    abstract-leveldown: ~6.2.1
+    napi-macros: ~2.0.0
+    node-gyp: latest
+    node-gyp-build: ~4.1.0
+  checksum: 3c7fc9455e7d3232a50658b7ee94f043e7649800e6ff671d32fc5305390359bc9ba5a76bba692c79e9d5ccf99baafd882b6408fb58fb944c9b01074745b2d9dc
   languageName: node
   linkType: hard
 
@@ -11446,6 +11487,13 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
+"napi-macros@npm:~2.0.0":
+  version: 2.0.0
+  resolution: "napi-macros@npm:2.0.0"
+  checksum: 1b67e5271e6688d7801a5bfa49c50c097ead038ed552af5f4b1e849255f711581b389cbeb8d746ee14803612dbdf205c086e75606f8ff7d354bc9d4b5863912c
+  languageName: node
+  linkType: hard
+
 "natural-compare@npm:^1.4.0":
   version: 1.4.0
   resolution: "natural-compare@npm:1.4.0"
@@ -11570,6 +11618,17 @@ fsevents@^2.1.2:
     node-gyp-build-optional: optional.js
     node-gyp-build-test: build-test.js
   checksum: 8512c25498b1605dbe9d2605cac7f8996d18c35097b3079b232674b0f3b8f1559be6f531ec3a00a94f90a0a69ccc452edb62f8f6dfff8caa3abe4b729cc21b06
+  languageName: node
+  linkType: hard
+
+"node-gyp-build@npm:~4.1.0":
+  version: 4.1.1
+  resolution: "node-gyp-build@npm:4.1.1"
+  bin:
+    node-gyp-build: ./bin.js
+    node-gyp-build-optional: ./optional.js
+    node-gyp-build-test: ./build-test.js
+  checksum: b63416498b98ac05b297cc6582744a76ff24e0e549dd619563e0edacd07526a27ded68e6ba11730aa0a7601bf04881a74d1f326475403cebc437b3767bafb531
   languageName: node
   linkType: hard
 
@@ -15382,6 +15441,7 @@ resolve@~1.17.0:
     ioredis: ^4.22.0
     jasmine-eth-ts: ^1.0.19
     jest: ^26.6.3
+    leveldown: 5.6.0
     nyc: ^15.1.0
     react: ^17.0.1
     react-dom: ^17.0.1
@@ -15885,7 +15945,17 @@ resolve@~1.17.0:
   languageName: node
   linkType: hard
 
-"typescript@^4.0.3, typescript@^4.1.3":
+typescript@^4.0.3:
+  version: 4.1.5
+  resolution: "typescript@npm:4.1.5"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 29157c84426ac94ce97aac836264f303a26bd9fb30865650229e3406a36ca2e89735ef4b8878075ba1b95fa4d3ff9810057b64888700c28e20b4034a6db4da83
+  languageName: node
+  linkType: hard
+
+typescript@^4.1.3:
   version: 4.1.3
   resolution: "typescript@npm:4.1.3"
   bin:
@@ -15895,7 +15965,17 @@ resolve@~1.17.0:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.0.3#builtin<compat/typescript>, typescript@patch:typescript@^4.1.3#builtin<compat/typescript>":
+"typescript@patch:typescript@^4.0.3#builtin<compat/typescript>":
+  version: 4.1.5
+  resolution: "typescript@patch:typescript@npm%3A4.1.5#builtin<compat/typescript>::version=4.1.5&hash=cc6730"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 58cc7786be0f8485c124944883b1384287532e4867ec37f1fb5cb2811dbc10f7a9decccad89097f924043285f3515bfd8223c61dbb4f88af00b2d8dc2ef73207
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^4.1.3#builtin<compat/typescript>":
   version: 4.1.3
   resolution: "typescript@patch:typescript@npm%3A4.1.3#builtin<compat/typescript>::version=4.1.3&hash=cc6730"
   bin:
@@ -17414,7 +17494,7 @@ resolve@~1.17.0:
   languageName: node
   linkType: hard
 
-"xtend@npm:^4.0.0, xtend@npm:^4.0.1, xtend@npm:~4.0.0, xtend@npm:~4.0.1":
+"xtend@npm:^4.0.0, xtend@npm:^4.0.1, xtend@npm:^4.0.2, xtend@npm:~4.0.0, xtend@npm:~4.0.1":
   version: 4.0.2
   resolution: "xtend@npm:4.0.2"
   checksum: 37ee522a3e9fb9b143a400c30b21dc122aa8c9c9411c6afae1005a4617dc20a21765c114d544e37a6bb60c2733dd8ee0a44ed9e80d884ac78cccd30b5e0ab0da

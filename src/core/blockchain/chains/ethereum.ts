@@ -3,14 +3,13 @@ import {CoinCode} from '../../defines';
 import BN from 'bn.js';
 import {AccountImplMapping} from '../../wallet/coins/defines';
 import Web3 from 'web3';
-import SDK from 'jasmine-eth-ts';
+import Web3Core from 'web3-core';
 import {PromiEvent} from '@troubkit/tools';
 import axios, {AxiosResponse} from 'axios';
 
 // eslint-disable-next-line require-jsdoc
 export class EthereumChain extends Chain<CoinCode.ETH> {
   readonly web3: Web3;
-  readonly jasmineSDK: SDK;
 
   // etherscan is only available for public chain
   etherscan: EtherscanProvider | undefined;
@@ -19,7 +18,6 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
   constructor(endpoint: string) {
     super();
     this.web3 = new Web3(endpoint);
-    this.jasmineSDK = new SDK(endpoint);
   }
 
   // eslint-disable-next-line require-jsdoc
@@ -67,6 +65,27 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
   }
 
   // eslint-disable-next-line require-jsdoc
+  private async signTransaction(
+      transaction: Web3Core.TransactionConfig,
+      from: Web3Core.Account,
+  ): Promise<Web3Core.SignedTransaction> {
+    if (!transaction.gasPrice) {
+      transaction.gasPrice = await this.web3.eth.getGasPrice();
+    }
+    if (!transaction.gas) {
+      transaction.gas = await this.web3.eth.estimateGas(transaction);
+    }
+    if (!transaction.nonce) {
+      transaction.nonce = await this.web3.eth
+          .getTransactionCount(from.address, 'pending');
+    }
+    if (!transaction.chainId) {
+      transaction.chainId = await this.web3.eth.getChainId();
+    }
+    return await from.signTransaction(transaction);
+  }
+
+  // eslint-disable-next-line require-jsdoc
   transfer(
       recipient: string | AccountImplMapping[CoinCode.ETH],
       amount: BigInt,
@@ -78,8 +97,8 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
     } else {
       addr = recipient.address;
     }
-    const sdkSender = this.jasmineSDK
-        .retrieveAccount(sender.privateKey.toString('hex'));
+    const sdkSender = this.web3.eth.accounts
+        .privateKeyToAccount(sender.privateKey.toString('hex'));
     const tx = {
       to: addr,
       value: new BN(amount.toString(10)),
@@ -87,10 +106,9 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
     };
     return new PromiEvent<TransactionID, TxEvents>(
         (resolve, reject, emitter) => {
-          this.jasmineSDK.signSimpleTransaction(
+          this.signTransaction(
               tx,
-              addr,
-              {from: sdkSender.web3Account},
+              sdkSender,
           ).then((signedTx) => {
             this.feedTxEvents(
                 emitter,
@@ -136,22 +154,39 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
       addr = recipient.address;
     }
     const tx = token.methods.transfer(addr, amount.toString(10));
-    const sdkSender = this.jasmineSDK
-        .retrieveAccount(sender.privateKey.toString('hex'));
+    const sdkSender = this.web3.eth.accounts
+        .privateKeyToAccount(sender.privateKey.toString('hex'));
     return new PromiEvent<TransactionID, TxEvents>(
-        (resolve, reject, emitter) => {
-          this.jasmineSDK.signContractTransaction(
-              tx,
-              erc20Address,
-              {from: sdkSender.web3Account},
-          ).then((signedTx) => {
-            this.feedTxEvents(
-                emitter,
-                resolve,
-                reject,
-          signedTx.rawTransaction as string,
-            );
-          });
+        async (resolve, reject, emitter) => {
+          try {
+            const nonce =
+              await this.web3.eth.getTransactionCount(sender.address);
+            const gasLimit =
+              await tx.estimateGas({from: sender.address});
+            const gasPrice = await this.web3.eth.getGasPrice();
+            const rawTx: Web3Core.TransactionConfig = {
+              from: sender.address,
+              to: erc20Address,
+              nonce: nonce,
+              value: 0,
+              data: tx.encodeABI(),
+              gas: gasLimit,
+              gasPrice: gasPrice,
+            };
+            this.signTransaction(
+                rawTx,
+                sdkSender,
+            ).then((signedTx) => {
+              this.feedTxEvents(
+                  emitter,
+                  resolve,
+                  reject,
+                signedTx.rawTransaction as string,
+              );
+            });
+          } catch (e) {
+            reject(e);
+          }
         },
     );
   }

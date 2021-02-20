@@ -1,4 +1,5 @@
 const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path');
 
 module.exports = [
   {
@@ -7,11 +8,17 @@ module.exports = [
     target: 'electron-main',
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
+      alias: {
+        // 'scrypt.js': path.resolve(__dirname, '../node_modules/scrypt.js/js.js'),
+        'swarm-js': path.resolve(__dirname, './node_modules/swarm-js/lib/api-browser.js'),
+        // 'fs': path.resolve(__dirname, '../src/app/fs-fake.js'),
+      }
     },
     module: {
       rules: [{
         test: /\.ts$/,
         include: /src/,
+        exclude: /__test__/,
         use: [{ loader: 'ts-loader' }],
       }],
     },
