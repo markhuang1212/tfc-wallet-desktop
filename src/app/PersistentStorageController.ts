@@ -1,11 +1,10 @@
 import { app } from 'electron'
 import fs from 'fs'
 import v8 from 'v8'
+import { promisify } from 'util'
 import path from 'path'
 
 class PersistentStorageController<T> {
-
-    static shared = new PersistentStorageController(path.join(app.getPath('userData'), 'data.txt'))
 
     path: string
 
@@ -30,16 +29,21 @@ class PersistentStorageController<T> {
         fs.writeFileSync(this.path, fileText)
     }
 
-    parseJSON(text: string) {
-        return JSON.parse(text)
+    async save() {
+        const fileText = this.makeJSON(this.object)
+        await promisify(fs.writeFile)(this.path, fileText)
     }
 
-    makeJSON(object: any) {
+    private parseJSON(text: string) {
+        return JSON.parse(text) as T | undefined
+    }
+
+    private makeJSON(object: any) {
         return JSON.stringify(object, undefined, 4)
     }
 
     getObjectCopy() {
-        return v8.deserialize(v8.serialize(this.object)) as T
+        return v8.deserialize(v8.serialize(this.object)) as T | undefined
     }
 
 }

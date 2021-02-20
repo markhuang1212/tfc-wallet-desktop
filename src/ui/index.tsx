@@ -14,10 +14,9 @@ function App() {
 
   useEffect(() => {
     ipcRenderer.invoke('get-accounts').then(accountData => {
-      console.log(accountData)
       setAccountData(accountData)
     })
-  })
+  }, [])
 
   const onSelectAccount = (index: number, subIndex?: number) => {
     if (subIndex === undefined) {
@@ -25,6 +24,43 @@ function App() {
     } else {
       setAccountDetailData({ ...accountData[index].subAccounts![subIndex] })
     }
+  }
+
+  const onImportAccount = async (
+    format: 'mnemonic' | 'seed',
+    type: 'bip44' | 'plain',
+    coinType: 'ETH' | 'BTC' | 'TFC' | undefined,
+    text: string) => {
+    setIsImportingAccount(false)
+
+    console.log(`${format} ${type} ${coinType} ${text}`)
+
+    if (type === 'bip44') {
+      if (format === 'mnemonic') {
+        const mnemonic = text.split(' ')
+        await ipcRenderer.invoke('create-bip44-account', mnemonic)
+      }
+      if (format === 'seed') {
+        await ipcRenderer.invoke('create-bip44-account', text)
+      }
+    }
+    
+    if (type === 'plain') {
+      if (format === 'mnemonic') {
+        console.log('NOT supported')
+        return
+      }
+      if (format === 'seed') {
+        if (coinType === undefined) {
+          console.log('invalid coin type')
+          return
+        }
+        await ipcRenderer.invoke('create-plain-account', coinType, text)
+      }
+    }
+
+    const newAccountData = await ipcRenderer.invoke('get-accounts')
+    setAccountData(newAccountData)
   }
 
   return (<div style={{
@@ -42,12 +78,11 @@ function App() {
       accounts={accountData}
       onSelectAccount={onSelectAccount} />
 
-    <AccountDetailView account={accountDetailData} />
+    <AccountDetailView account={accountDetailData} onRename={(_) => { }} />
 
     <ImportAccountView visible={isImportingAccount}
       onCancel={() => setIsImportingAccount(false)}
-      onCreateAccount={() => { }}
-      onImportAccount={() => { }} />
+      onImportAccount={onImportAccount} />
   </div>);
 }
 

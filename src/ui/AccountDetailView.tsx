@@ -1,8 +1,13 @@
 import { AccountData } from "./../Types";
-import { AppBar, Button, Container, IconButton, InputAdornment, TextField, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport, Check } from '@material-ui/icons'
 import { useEffect, useState } from "react";
+
+interface AccountDetailViewProps {
+  account?: AccountData | Required<AccountData>['subAccounts'][number]
+  onRename: (newName: string) => any
+}
 
 const useStyle = makeStyles({
   container: {
@@ -10,25 +15,90 @@ const useStyle = makeStyles({
   },
   content: {
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    paddingTop: '24px'
   }
 })
 
-interface AccountDetailViewProps {
-  account?: AccountData | Required<AccountData>['subAccounts'][number]
-  onRename?: (newName: string) => {}
+function AccountDetailBalance(props: { balance: string }) {
+  return (
+    <div>
+      <Typography variant="subtitle1">Balance</Typography>
+      <Typography variant="h2">{props.balance}</Typography>
+    </div>
+  )
 }
 
-function Bip44MasterAccountDetailViewContent(props: AccountDetailViewProps) {
+function AccountDetailRename(props: { accountName: string, onRename: (newName: string) => any }) {
+  const [accountName, setAccountName] = useState('')
+
+  useEffect(() => {
+    setAccountName(props.accountName)
+  }, [props.accountName])
+
+  const changeAccountName = (e: any) => {
+    setAccountName(e.target.value)
+  }
+
+  return (
+    <div>
+      <TextField style={{ marginTop: '24px' }}
+        variant="outlined" value={accountName}
+        onChange={changeAccountName}
+        label="Account Name"
+        InputProps={{
+          endAdornment: (<IconButton color="primary" style={{
+            visibility: props.accountName !== accountName ? 'visible' : 'hidden'
+          }}><Check></Check></IconButton>)
+        }}>
+      </TextField>
+    </div>
+  )
+}
+
+function AccountDetailKeys(props: { privKey?: string, pubKey?: string }) {
+  return (
+    <div style={{ paddingTop: '24px' }}>
+      {props.pubKey && <Typography>Private Key: {props.privKey}</Typography>}
+      {props.privKey && <Typography>Public Key: {props.pubKey}</Typography>}
+    </div>
+  )
+}
+
+function AccountDetailChooseIndex(props: { index: number, onChoose: (newIndex: number) => any }) {
+  const [index, setIndex] = useState(props.index)
+  useEffect(() => {
+    setIndex(props.index)
+  }, [props.index])
   return null
 }
 
-function Bip44CoinAccountDetailViewContent(props: AccountDetailViewProps) {
-  return null
-}
+type Erc20Coin = 'ETH' | 'USDT' | 'TFC'
+function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: Erc20Coin) => any }) {
 
-function PlainAccountDetailViewContent(props: AccountDetailViewProps) {
-  return null
+  const [coin, setCoin] = useState(props.coin)
+
+  const onChoose = (e: any) => {
+    if (coin !== e.target.value) {
+      setCoin(e.target.value)
+      onChoose(e.target.value)
+    }
+  }
+
+  useEffect(() => {
+    setCoin(props.coin)
+  }, [props.coin])
+
+  return (
+    <FormControl variant="outlined">
+      <InputLabel>ETH/ERC20 Coin</InputLabel>
+      <Select value={coin} onChange={onChoose}>
+        <MenuItem value="ETH">ETH</MenuItem>
+        <MenuItem value="USDT">USDT</MenuItem>
+        <MenuItem value="TFC">TFC</MenuItem>
+      </Select>
+    </FormControl>
+  )
 }
 
 function AccountDetailView(props: AccountDetailViewProps) {
@@ -42,10 +112,6 @@ function AccountDetailView(props: AccountDetailViewProps) {
     }
   }, [props.account])
 
-  const changeAccountName = (event: any) => {
-    setAccountName(event.target.value)
-  }
-
   return (
     <div className={classes.container}>
       <AppBar position="static">
@@ -54,29 +120,21 @@ function AccountDetailView(props: AccountDetailViewProps) {
           <span style={{ flex: 1 }}></span>
           {props.account && (<Button color="inherit">Transfer</Button>)}
           {props.account && (<Button color="inherit">Export</Button>)}
+          <Button color="inherit" onClick={() => location.reload()}>Refresh</Button>
         </Toolbar>
       </AppBar>
       <Container maxWidth="sm">
         {props.account ?
           <div className={classes.content}>
-            <div style={{ display: props.account?.accountType === 'plain' ? 'block' : 'none', marginTop: '24px' }}>
-              <Typography variant="subtitle1">Balance</Typography>
-              <Typography variant="h2">{props.account?.accountBalance?.toString()}</Typography>
-            </div>
-            <TextField style={{ marginTop: '24px' }}
-              variant="outlined" value={accountName}
-              onChange={changeAccountName}
-              label="Account Name"
-              InputProps={{
-                endAdornment: props.account.accountName !== accountName ? (<IconButton color="primary"><Check></Check></IconButton>) : undefined
-              }}>
-            </TextField>
+            {props.account.coinType?.abbrName == 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={(_) => { }} />}
+            {props.account.accountBalance && <AccountDetailBalance balance={props.account.accountBalance.toString()} />}
+            {/* <AccountDetailRename accountName={props.account.accountName} onRename={props.onRename} /> */}
+            <AccountDetailKeys pubKey={props.account.pubKey} privKey={props.account.privKey} />
           </div> :
           <div>
             <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>Select An Account</Typography>
           </div>
         }
-
       </Container>
     </div>
   );
