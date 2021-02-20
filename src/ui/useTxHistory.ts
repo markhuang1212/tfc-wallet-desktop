@@ -2,4 +2,4 @@ function useTxHistory() {
 
 }
 
-export useTxHistory
+export default useTxHistory
