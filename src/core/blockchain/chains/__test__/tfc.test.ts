@@ -33,4 +33,12 @@ describe('TFC-Chain', () => {
       done();
     });
   }, 9999999);
+
+  test('should get exchange record correctly', async ()=>{
+    const tfcChain = new TfcChain(Endpoints[CoinCode.TFC_CHAIN]['9523']);
+    const records = await tfcChain.getExchangeRecords(
+        '14wW9abVreagLW1gDWo9F4UziqEEJnBJ5K',
+    );
+    expect(records.length).toBeGreaterThan(0);
+  });
 });

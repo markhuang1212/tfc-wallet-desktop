@@ -6,6 +6,7 @@ import axios, {AxiosResponse} from 'axios';
 import {EthAccount, TfcChainAccount} from '../../wallet';
 import {EthereumChain} from './ethereum';
 import {Endpoints} from '../defines';
+import retryTimes = jest.retryTimes;
 
 // eslint-disable-next-line require-jsdoc
 export class TfcBip44Chain extends Chain<CoinCode.TFC_BIP44> {
@@ -172,5 +173,53 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
           }
         },
     );
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  async getExchangeRecords(
+      tfcAddressOrAccount: string | TfcChainAccount,
+  ): Promise<{
+    txId: string,
+    from: string,
+    to: string,
+    amount: BigInt,
+    date: string,
+  }[]> {
+    let tfcAddress: string;
+    if (typeof tfcAddressOrAccount === 'string') {
+      tfcAddress = tfcAddressOrAccount;
+    } else {
+      tfcAddress = tfcAddressOrAccount.address;
+    }
+    const resp = await axios.get(`${this.endpoint}/statement/account`, {
+      params: {
+        address: tfcAddress,
+        rewardType: 8,
+      },
+    });
+    const result = TfcChain.throwIfAPIError(resp) as { data: {
+      [dateString: string]: {
+        txid: string,
+        otherAddr: string,
+        reward: string
+      }[] | null
+      }
+    };
+    const ret = [];
+    for (const dateString of Object.keys(result.data)) {
+      const temp = result.data[dateString];
+      if (Array.isArray(temp)) {
+        for (const record of temp) {
+          ret.push({
+            txId: record.txid,
+            from: tfcAddress,
+            to: record.otherAddr,
+            amount: BigInt(record.reward),
+            date: dateString,
+          });
+        }
+      }
+    }
+    return ret;
   }
 }
