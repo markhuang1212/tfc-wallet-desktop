@@ -5,7 +5,7 @@ import {AccountImplMapping} from '../../wallet/coins/defines';
 import Web3 from 'web3';
 import SDK from 'jasmine-eth-ts';
 import {PromiEvent} from '@troubkit/tools';
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 
 // eslint-disable-next-line require-jsdoc
 export class EthereumChain extends Chain<CoinCode.ETH> {
@@ -292,6 +292,22 @@ class EtherscanProvider {
   }
 
   // eslint-disable-next-line require-jsdoc
+  private static throwIfAPIError(resp: AxiosResponse): unknown {
+    if (Math.floor(resp.status / 100) !== 2) {
+      throw new Error('Etherscan API HTTP error with code ' + resp.status);
+    }
+    const data = resp.data as {
+      status: string,
+      message: string,
+      result: string | unknown
+    };
+    if (data.status !== '1') {
+      throw new Error(`${data.message}: ${data.result as string}`);
+    }
+    return data.result;
+  }
+
+  // eslint-disable-next-line require-jsdoc
   async getListOfNormalTransactionsByAddress(
       address: string,
       startBlock: BigInt,
@@ -309,18 +325,8 @@ class EtherscanProvider {
         sort: sort,
       },
     });
-    if (Math.floor(resp.status / 100) !== 2) {
-      throw new Error('Etherscan API HTTP error with code ' + resp.status);
-    }
-    const data = resp.data as {
-      status: string,
-      message: string,
-      result: string | EtherscanTransaction[]
-    };
-    if (data.status !== '1') {
-      throw new Error(`${data.message}: ${data.result as string}`);
-    }
-    return data.result as EtherscanTransaction[];
+    return EtherscanProvider
+        .throwIfAPIError(resp) as EtherscanTransaction[];
   }
 
   // eslint-disable-next-line require-jsdoc
@@ -341,17 +347,7 @@ class EtherscanProvider {
         sort: sort,
       },
     });
-    if (Math.floor(resp.status / 100) !== 2) {
-      throw new Error('Etherscan API HTTP error with code ' + resp.status);
-    }
-    const data = resp.data as {
-      status: string,
-      message: string,
-      result: string | EtherscanTransaction[]
-    };
-    if (data.status !== '1') {
-      throw new Error(`${data.message}: ${data.result as string}`);
-    }
-    return data.result as EtherscanTransaction[];
+    return EtherscanProvider
+        .throwIfAPIError(resp) as EtherscanTransaction[];
   }
 }

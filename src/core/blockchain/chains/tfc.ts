@@ -2,7 +2,7 @@ import {Chain, TransactionID, TxEvents} from '../chain';
 import {CoinCode} from '../../defines';
 import {AccountImplMapping} from '../../wallet/coins/defines';
 import {PromiEvent} from '@troubkit/tools';
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 
 // eslint-disable-next-line require-jsdoc
 export class TfcBip44Chain extends Chain<CoinCode.TFC_BIP44> {
@@ -40,6 +40,22 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
   }
 
   // eslint-disable-next-line require-jsdoc
+  private static throwIfAPIError(resp: AxiosResponse): unknown {
+    if (Math.floor(resp.status / 100) !== 2) {
+      throw new Error('get balance API status is ' + resp.status);
+    }
+    const response = resp.data as {
+      code: number,
+      msg: string,
+      data: unknown | null,
+    };
+    if (response.code !== 0) {
+      throw new Error(`${response.msg}`);
+    }
+    return response.data;
+  }
+
+  // eslint-disable-next-line require-jsdoc
   async getBalance(
       accountOrAddress: AccountImplMapping[CoinCode.TFC_BIP44] | string,
   ): Promise<BigInt> {
@@ -50,21 +66,11 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
       address = accountOrAddress.address;
     }
     const resp = await axios.get(`${this.endpoint}/balance/${address}`);
-    if (Math.floor(resp.status / 100) !== 2) {
-      throw new Error('get balance API status is ' + resp.status);
-    }
-    const response = resp.data as {
-      code: number,
-      msg: string,
-      data: {
-        activeTFC: string,
-        pendingTFC: string,
-      } | string
+    const response = TfcChain.throwIfAPIError(resp) as {
+      activeTFC: string,
+      pendingTFC: string
     };
-    if (response.code !== 0) {
-      throw new Error(`${response.msg}`);
-    }
-    return BigInt((response.data as {activeTFC: string}).activeTFC);
+    return BigInt(response.activeTFC);
   }
 
   // eslint-disable-next-line require-jsdoc
