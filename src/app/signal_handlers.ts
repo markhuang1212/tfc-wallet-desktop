@@ -7,13 +7,16 @@ import { ipcMain } from 'electron'
 import { TxInfo } from '../Types'
 import WalletController from './WalletController'
 
+ipcMain.handle('load-demo-data', async () => {
+    WalletController.shared.loadDemoData()
+})
+
 ipcMain.handle('get-accounts', async () => {
-    // WalletController.shared.loadDemoData()
     return WalletController.shared.getAccounts()
 })
 
-ipcMain.handle('get-balance', async (_, accountId: string, ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
-
+ipcMain.handle('get-balance', async (_, privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
+    return 100n
 })
 
 ipcMain.handle('create-plain-account', async (event, coinType: 'BTC' | 'ETH' | 'TFC', privKey: string) => {
@@ -22,9 +25,9 @@ ipcMain.handle('create-plain-account', async (event, coinType: 'BTC' | 'ETH' | '
 
 ipcMain.handle('create-bip44-account', async (event, privKey: string | string[]) => {
     if (typeof privKey === 'string') {
-
+        WalletController.shared.loadWallet(privKey)
     } else if (typeof privKey === 'object') {
-
+        WalletController.shared.loadWallet(privKey)
     }
 })
 

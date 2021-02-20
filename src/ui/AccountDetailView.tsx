@@ -3,6 +3,8 @@ import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextFie
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport, Check } from '@material-ui/icons'
 import { useEffect, useState } from "react";
+import { ipcRenderer } from "electron";
+import useBalance from "./useBalance";
 
 interface AccountDetailViewProps {
   account?: AccountData | Required<AccountData>['subAccounts'][number]
@@ -56,11 +58,12 @@ function AccountDetailRename(props: { accountName: string, onRename: (newName: s
   )
 }
 
-function AccountDetailKeys(props: { privKey?: string, pubKey?: string }) {
+function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string }) {
   return (
     <div style={{ paddingTop: '24px' }}>
       {props.pubKey && <Typography>Private Key: {props.privKey}</Typography>}
       {props.privKey && <Typography>Public Key: {props.pubKey}</Typography>}
+      {props.mnemonic && <Typography>Mnemonic: {props.mnemonic}</Typography>}
     </div>
   )
 }
@@ -105,12 +108,13 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
   const classes = useStyle()
   const [accountName, setAccountName] = useState('')
+  const [ercCoin, setErcCoin] = useState<'ETH' | 'TFC' | 'USDT'>('ETH')
+  const balance = (props.account && props.account.accountType !== 'bip44-master') ?
+    useBalance(props.account.privKey, props.account.coinType!.abbrName as any, ercCoin) : 0n
 
-  useEffect(() => {
-    if (props.account) {
-      setAccountName(props.account.accountName)
-    }
-  }, [props.account])
+  const onChooseErcCoin = (coin: 'ETH' | 'TFC' | 'USDT') => {
+    setErcCoin(coin)
+  }
 
   return (
     <div className={classes.container}>
@@ -119,16 +123,14 @@ function AccountDetailView(props: AccountDetailViewProps) {
           <Typography variant='h6'>TFC Wallet</Typography>
           <span style={{ flex: 1 }}></span>
           {props.account && (<Button color="inherit">Transfer</Button>)}
-          {props.account && (<Button color="inherit">Export</Button>)}
           <Button color="inherit" onClick={() => location.reload()}>Refresh</Button>
         </Toolbar>
       </AppBar>
       <Container maxWidth="sm">
         {props.account ?
           <div className={classes.content}>
-            {props.account.coinType?.abbrName == 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={(_) => { }} />}
-            {props.account.accountBalance && <AccountDetailBalance balance={props.account.accountBalance.toString()} />}
-            {/* <AccountDetailRename accountName={props.account.accountName} onRename={props.onRename} /> */}
+            {props.account.coinType?.abbrName == 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
+            {balance && <AccountDetailBalance balance={balance.toString()} />}
             <AccountDetailKeys pubKey={props.account.pubKey} privKey={props.account.privKey} />
           </div> :
           <div>

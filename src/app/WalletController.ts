@@ -25,6 +25,8 @@ class WalletController {
     wallet: Wallet
     info: WalletInfo
 
+    data_temp: AccountData[] = []
+
     private walletPsc: PersistentStorageController<WalletJSON>
     private infoPsc: PersistentStorageController<WalletInfo>
 
@@ -61,7 +63,7 @@ class WalletController {
         } else if (coinType === 'ETH') {
             this.wallet.getCoinWallet(CoinCode.ETH).addStandaloneAccounts(privKey)
         } else if (coinType === 'TFC') {
-            this.wallet.getCoinWallet(CoinCode.TFC).addStandaloneAccounts(privKey)
+            this.wallet.getCoinWallet(CoinCode.TFC_CHAIN).addStandaloneAccounts(privKey)
         }
         this.walletPsc.object = this.wallet.toJSON()
         this.walletPsc.save()
@@ -80,7 +82,7 @@ class WalletController {
                         accountId: uuidv4(),
                         accountName: 'ETH/ERC20',
                         accountType: 'bip44-sub-account',
-                        accountBalance: '0',
+                        // accountBalance: '0',
                         privKey: this.wallet.coinWallets[60].privateKey.toString('hex'),
                         pubKey: 'public key',
                         derivationPath: `m/44'/60'/0'/0/0`,
@@ -98,7 +100,7 @@ class WalletController {
                 accountId: uuidv4(),
                 accountName: 'Account',
                 accountType: 'plain',
-                accountBalance: '0',
+                // accountBalance: '0',
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
                 passPhrase: ['pass', 'phrase'],
@@ -111,7 +113,7 @@ class WalletController {
                 accountId: uuidv4(),
                 accountName: 'Account',
                 accountType: 'plain',
-                accountBalance: '0',
+                // accountBalance: '0',
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
                 passPhrase: ['pass', 'phrase'],
@@ -119,12 +121,12 @@ class WalletController {
             })
         })
 
-        this.wallet.getCoinWallet(CoinCode.TFC).standaloneAccounts.forEach(account => {
+        this.wallet.getCoinWallet(CoinCode.TFC_CHAIN).standaloneAccounts.forEach(account => {
             data.push({
                 accountId: uuidv4(),
                 accountName: 'Account',
                 accountType: 'plain',
-                accountBalance: '0',
+                // accountBalance: '0',
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
                 passPhrase: ['pass', 'phrase'],
@@ -132,8 +134,8 @@ class WalletController {
             })
         })
 
+        this.data_temp = data
         return data
-
     }
 
     constructor() {

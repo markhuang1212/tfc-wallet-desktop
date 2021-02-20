@@ -20,8 +20,8 @@ interface AccountData {
 
     accountType: 'bip44-master' | 'plain',
 
-    accountBalance?: string // balance is cached
-    txs?: TxInfo[] // txs is cached
+    // accountBalance?: string // balance is cached
+    // txs?: TxInfo[] // txs is cached
     coinType?: Coin // for plain account. Possible options: CoinBTC, CoinTFC, CoinETH, CoinUSDT
 
     subAccounts?: {
@@ -29,9 +29,9 @@ interface AccountData {
         accountId: string,
         derivationPath: string
         accountName: string
-        accountBalance?: string
+        // accountBalance?: string
         coinType: Coin
-        txs?: TxInfo[]
+        // txs?: TxInfo[]
         privKey: string
         pubKey: string
     }[] // for bip44 accounts
