@@ -3,6 +3,9 @@ import {CoinCode} from '../../defines';
 import {AccountImplMapping} from '../../wallet/coins/defines';
 import {PromiEvent} from '@troubkit/tools';
 import axios, {AxiosResponse} from 'axios';
+import {EthAccount, TfcChainAccount} from '../../wallet';
+import {EthereumChain} from './ethereum';
+import {Endpoints} from '../defines';
 
 // eslint-disable-next-line require-jsdoc
 export class TfcBip44Chain extends Chain<CoinCode.TFC_BIP44> {
@@ -52,7 +55,7 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
     if (response.code !== 0) {
       throw new Error(`${response.msg}`);
     }
-    return response.data;
+    return response;
   }
 
   // eslint-disable-next-line require-jsdoc
@@ -67,10 +70,12 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
     }
     const resp = await axios.get(`${this.endpoint}/balance/${address}`);
     const response = TfcChain.throwIfAPIError(resp) as {
-      activeTFC: string,
-      pendingTFC: string
+      data: {
+        activeTFC: string,
+        pendingTFC: string
+      }
     };
-    return BigInt(response.activeTFC);
+    return BigInt(response.data.activeTFC);
   }
 
   // eslint-disable-next-line require-jsdoc
@@ -82,5 +87,90 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
     return PromiEvent.reject(
         new Error('Transfer is not available on TFC-Chain'),
     ) as unknown as PromiEvent<TransactionID, TxEvents>;
+  }
+
+  /**
+   * Exchange TFC to TFC-ERC20
+   *
+   * @param {string | TfcChainAccount} tfcAddressOrAccount the TFC account
+   * @param {EthAccount} ethAccount the Ethereum account that receives TFC-ERC20
+   * @param {BigInt} amount amount of TFC to exchange
+   * @return {PromiEvent} a promievent
+   */
+  exchangeToErc20(
+      tfcAddressOrAccount: string | TfcChainAccount,
+      ethAccount: EthAccount,
+      amount: BigInt,
+  ): PromiEvent<void, {
+    transactionFeePaying: [TransactionID];
+    transactionFeePaid: [TransactionID];
+    erc20Minting: [];
+    erc20Minted: [];
+  }> {
+    let tfcAddress: string;
+    if (typeof tfcAddressOrAccount === 'string') {
+      tfcAddress = tfcAddressOrAccount;
+    } else {
+      tfcAddress = tfcAddressOrAccount.address;
+    }
+    return new PromiEvent(
+        async (resolve, reject, emitter) => {
+          try {
+            const resp = await axios.post(`${this.endpoint}/v4/estimateTx`, {
+              tfcAddr: tfcAddress,
+              ercAddr: ethAccount.address,
+              amount: amount.toString(10),
+            });
+            const result = TfcChain.throwIfAPIError(resp) as {
+            bridgeAccount: string,
+            requiredTransferAmount: string,
+          };
+            const ethChain = new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+            ethChain.confirmationRequirement = 6;
+            // pay transaction fee for exchange
+            ethChain.transfer(
+                result.bridgeAccount,
+                BigInt(result.requiredTransferAmount),
+                ethAccount,
+            ).on('pending', (txHash) => {
+              emitter.emit('transactionFeePaying', txHash);
+            }).on('executed', (txHash) => {
+              emitter.emit('transactionFeePaid', txHash);
+            }).on('finalized', async (txHash) => {
+            // submit request to TFC-chain
+              const resp = await axios.post(
+                  `${this.endpoint}/v4/exchange/eth`,
+                  {
+                    tfcAddr: tfcAddress,
+                    txHash: txHash,
+                  },
+              );
+              TfcChain.throwIfAPIError(resp);
+              emitter.emit('erc20Minting');
+
+              // polling exchange status until success
+              const checkSuccess = async (): Promise<boolean> => {
+                const resp = await axios.get(
+                    `${this.endpoint}/v4/pendingAmount/${tfcAddress}`,
+                );
+                const result = TfcChain.throwIfAPIError(resp) as {
+                pendingAmount: string,
+              };
+                return BigInt(result.pendingAmount) === BigInt(0);
+              };
+              // periodically check mint status
+              const interval = setInterval(async () => {
+                if (await checkSuccess()) {
+                  clearInterval(interval);
+                  emitter.emit('erc20Minted');
+                  resolve();
+                }
+              }, 1000);
+            });
+          } catch (e) {
+            reject(e);
+          }
+        },
+    );
   }
 }
