@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import {AccountImplMapping} from '../../wallet/coins/defines';
 import Web3 from 'web3';
 import Web3Core from 'web3-core';
+import {ContractSendMethod} from 'web3-eth-contract';
 import {PromiEvent} from '@troubkit/tools';
 import axios, {AxiosResponse} from 'axios';
 
@@ -65,6 +66,22 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
   }
 
   // eslint-disable-next-line require-jsdoc
+  private async buildContractInvocationTransaction(
+      contractMethodCall: ContractSendMethod,
+      contractAddress: string,
+      from: Web3Core.Account,
+  ): Promise<Web3Core.TransactionConfig> {
+    const gasLimit =
+      await contractMethodCall.estimateGas({from: from.address});
+    return {
+      from: from.address,
+      to: contractAddress,
+      data: contractMethodCall.encodeABI(),
+      gas: gasLimit,
+    };
+  }
+
+  // eslint-disable-next-line require-jsdoc
   private async signTransaction(
       transaction: Web3Core.TransactionConfig,
       from: Web3Core.Account,
@@ -81,6 +98,9 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
     }
     if (!transaction.chainId) {
       transaction.chainId = await this.web3.eth.getChainId();
+    }
+    if (!transaction.value) {
+      transaction.value = 0;
     }
     return await from.signTransaction(transaction);
   }
@@ -153,28 +173,20 @@ export class EthereumChain extends Chain<CoinCode.ETH> {
     } else {
       addr = recipient.address;
     }
-    const tx = token.methods.transfer(addr, amount.toString(10));
+    const contractInvocation =
+      token.methods.transfer(addr, amount.toString(10));
     const sdkSender = this.web3.eth.accounts
         .privateKeyToAccount(sender.privateKey.toString('hex'));
     return new PromiEvent<TransactionID, TxEvents>(
         async (resolve, reject, emitter) => {
           try {
-            const nonce =
-              await this.web3.eth.getTransactionCount(sender.address);
-            const gasLimit =
-              await tx.estimateGas({from: sender.address});
-            const gasPrice = await this.web3.eth.getGasPrice();
-            const rawTx: Web3Core.TransactionConfig = {
-              from: sender.address,
-              to: erc20Address,
-              nonce: nonce,
-              value: 0,
-              data: tx.encodeABI(),
-              gas: gasLimit,
-              gasPrice: gasPrice,
-            };
+            const tx = await this.buildContractInvocationTransaction(
+                contractInvocation,
+                erc20Address,
+                sdkSender,
+            );
             this.signTransaction(
-                rawTx,
+                tx,
                 sdkSender,
             ).then((signedTx) => {
               this.feedTxEvents(
