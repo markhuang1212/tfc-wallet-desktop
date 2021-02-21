@@ -1,9 +1,9 @@
 import { AccountData } from "./../Types";
-import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem } from '@material-ui/core'
+import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem, FormControlLabel } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport, Check } from '@material-ui/icons'
 import { useEffect, useState } from "react";
-import { ipcRenderer } from "electron";
+import { ipcRenderer, Menu } from "electron";
 import useBalance from "./useBalance";
 
 interface AccountDetailViewProps {
@@ -31,36 +31,9 @@ function AccountDetailBalance(props: { balance: string }) {
   )
 }
 
-function AccountDetailRename(props: { accountName: string, onRename: (newName: string) => any }) {
-  const [accountName, setAccountName] = useState('')
-
-  useEffect(() => {
-    setAccountName(props.accountName)
-  }, [props.accountName])
-
-  const changeAccountName = (e: any) => {
-    setAccountName(e.target.value)
-  }
-
-  return (
-    <div>
-      <TextField style={{ marginTop: '24px' }}
-        variant="outlined" value={accountName}
-        onChange={changeAccountName}
-        label="Account Name"
-        InputProps={{
-          endAdornment: (<IconButton color="primary" style={{
-            visibility: props.accountName !== accountName ? 'visible' : 'hidden'
-          }}><Check></Check></IconButton>)
-        }}>
-      </TextField>
-    </div>
-  )
-}
-
 function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string }) {
   return (
-    <div style={{ paddingTop: '24px' }}>
+    <div style={{ marginTop: '24px' }}>
       {props.pubKey && <Typography>Private Key: {props.privKey}</Typography>}
       {props.privKey && <Typography>Public Key: {props.pubKey}</Typography>}
       {props.mnemonic && <Typography>Mnemonic: {props.mnemonic}</Typography>}
@@ -70,10 +43,25 @@ function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?
 
 function AccountDetailChooseIndex(props: { index: number, onChoose: (newIndex: number) => any }) {
   const [index, setIndex] = useState(props.index)
-  useEffect(() => {
-    setIndex(props.index)
-  }, [props.index])
-  return null
+
+  const onChangeIndex = (e: any) => {
+    setIndex(e.target.value)
+    props.onChoose(e.target.value)
+  }
+
+  return (
+    <FormControl variant="outlined" style={{ marginTop: '24px' }}>
+      <InputLabel>Account Index</InputLabel>
+      <Select value={index} onChange={onChangeIndex}>
+        {
+          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(v => (
+            <MenuItem value={v} key={v}>{v}</MenuItem>
+          ))
+        }
+      </Select>
+
+    </FormControl>
+  )
 }
 
 type Erc20Coin = 'ETH' | 'USDT' | 'TFC'
@@ -84,7 +72,7 @@ function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: E
   const onChoose = (e: any) => {
     if (coin !== e.target.value) {
       setCoin(e.target.value)
-      onChoose(e.target.value)
+      props.onChoose(e.target.value)
     }
   }
 
@@ -109,11 +97,24 @@ function AccountDetailView(props: AccountDetailViewProps) {
   const classes = useStyle()
   const [accountName, setAccountName] = useState('')
   const [ercCoin, setErcCoin] = useState<'ETH' | 'TFC' | 'USDT'>('ETH')
-  const balance = (props.account && props.account.accountType !== 'bip44-master') ?
-    useBalance(props.account.privKey, props.account.coinType!.abbrName as any, ercCoin) : 0n
+  const [balance, setBalance] = useState<bigint | undefined>(undefined)
+  const [accountIndex, setAccountIndex] = useState(0)
+
+  useEffect(() => {
+    if (props.account && props.account.accountType === 'plain') {
+      ipcRenderer.invoke('get-balance', props.account.privKey, props.account.coinType!.abbrName, ercCoin).then(balance => setBalance(balance))
+    } else if (props.account && props.account.accountType === 'bip44-sub-account') {
+      ipcRenderer.invoke('get-balance', props.account.keys[accountIndex].privKey, props.account.coinType!.abbrName, ercCoin).then(balance => setBalance(balance))
+    }
+  }, [props.account, accountIndex])
 
   const onChooseErcCoin = (coin: 'ETH' | 'TFC' | 'USDT') => {
     setErcCoin(coin)
+  }
+
+  const onChooseIndex = (newIndex: number) => {
+    console.log(newIndex)
+    setAccountIndex(newIndex)
   }
 
   return (
@@ -130,8 +131,11 @@ function AccountDetailView(props: AccountDetailViewProps) {
         {props.account ?
           <div className={classes.content}>
             {props.account.coinType?.abbrName == 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
-            {balance && <AccountDetailBalance balance={balance.toString()} />}
-            <AccountDetailKeys pubKey={props.account.pubKey} privKey={props.account.privKey} />
+            {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
+            {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
+            <AccountDetailKeys
+              pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : props.account.pubKey}
+              privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey} />
           </div> :
           <div>
             <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>Select An Account</Typography>

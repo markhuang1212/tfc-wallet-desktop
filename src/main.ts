@@ -1,16 +1,6 @@
-import { Buffer } from 'buffer';
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import './app/signal_handlers.ts'
-import { EthereumChain } from './core/blockchain';
-import { Endpoints } from './core/blockchain/defines';
-import { EthAccount } from './core/wallet';
-
-const privKey = '4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
-const account = new EthAccount(Buffer.from(privKey, 'hex'))
-const ethChain = new EthereumChain(Endpoints[60].rinkeby)
-
-ethChain.getBalance(account).then(balance => console.log(balance))
 
 function createWindow() {
   const win = new BrowserWindow({

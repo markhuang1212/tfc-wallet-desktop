@@ -5,6 +5,7 @@
 
 import { ipcMain } from 'electron'
 import { TxInfo } from '../Types'
+import AddressInfoProvider from './AddressInfoProvider'
 import WalletController from './WalletController'
 
 ipcMain.handle('load-demo-data', async () => {
@@ -16,7 +17,8 @@ ipcMain.handle('get-accounts', async () => {
 })
 
 ipcMain.handle('get-balance', async (_, privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
-    return 100n
+    const balance = await AddressInfoProvider.shared.getBalance(privKey, coinType, ercCoin)
+    return balance
 })
 
 ipcMain.handle('create-plain-account', async (event, coinType: 'BTC' | 'ETH' | 'TFC', privKey: string) => {

@@ -27,18 +27,22 @@ interface AccountData {
     subAccounts?: {
         accountType: 'bip44-sub-account'
         accountId: string,
-        derivationPath: string
+        // derivationPath: string
         accountName: string
         // accountBalance?: string
         coinType: Coin
         // txs?: TxInfo[]
-        privKey: string
-        pubKey: string
+        // privKey: string
+        // pubKey: string
+        keys: {
+            privKey: string
+            pubKey: string
+        }[]
     }[] // for bip44 accounts
 
     passPhrase: string[]
     privKey: string
-    pubKey: string
+    pubKey?: string
 }
 
 export { AccountData, TxInfo, Coin }

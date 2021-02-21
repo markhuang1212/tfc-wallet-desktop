@@ -1,12 +1,11 @@
 import { AccountData } from "../Types";
-import demo_data from './demo_data'
 import { app } from 'electron'
 import path from 'path'
 import PersistentStorageController from "./PersistentStorageController";
 import v8 from 'v8'
 import { v4 as uuidv4 } from 'uuid'
 import { Wallet, WalletJSON } from "../core/wallet";
-import { CoinBTC, CoinETH } from "../Const";
+import { CoinBTC, CoinETH, CoinTFC } from "../Const";
 import { CoinCode } from "../core/defines";
 
 interface WalletInfo {
@@ -82,15 +81,36 @@ class WalletController {
                         accountId: uuidv4(),
                         accountName: 'ETH/ERC20',
                         accountType: 'bip44-sub-account',
-                        // accountBalance: '0',
-                        privKey: this.wallet.coinWallets[60].privateKey.toString('hex'),
-                        pubKey: 'public key',
-                        derivationPath: `m/44'/60'/0'/0/0`,
+                        keys: (() => {
+                            let keys: { privKey: string, pubKey: string }[] = []
+                            for (let i = 0; i < 10; i++) {
+                                keys.push({
+                                    privKey: this.wallet.coinWallets['60'].getBip44Account(i).privateKey.toString('hex'),
+                                    pubKey: this.wallet.coinWallets['60'].getBip44Account(i).publicKey
+                                })
+                            }
+                            return keys
+                        })(),
                         coinType: CoinETH,
+                    }, {
+                        accountId: uuidv4(),
+                        accountName: 'TFC',
+                        accountType: 'bip44-sub-account',
+                        keys: (() => {
+                            let keys: { privKey: string, pubKey: string }[] = []
+                            for (let i = 0; i < 10; i++) {
+                                keys.push({
+                                    privKey: this.wallet.coinWallets['599'].getBip44Account(i).privateKey.toString('hex'),
+                                    pubKey: this.wallet.coinWallets['599'].getBip44Account(i).publicKey
+                                })
+                            }
+                            return keys
+                        })(),
+                        coinType: CoinTFC
                     }
                 ],
                 privKey: this.wallet.privateKey.toString('hex'),
-                pubKey: 'public key',
+                // pubKey: 'public key',
                 passPhrase: ['pass phrase']
             })
         }
