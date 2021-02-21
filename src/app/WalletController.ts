@@ -110,7 +110,6 @@ class WalletController {
                     }
                 ],
                 privKey: this.wallet.privateKey.toString('hex'),
-                // pubKey: 'public key',
                 passPhrase: ['pass phrase']
             })
         }

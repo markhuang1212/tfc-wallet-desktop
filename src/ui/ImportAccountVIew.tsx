@@ -18,7 +18,7 @@ function ImportAccountActionView(props: {
   const [format, setFormat] = useState<'mnemonic' | 'seed'>('mnemonic')
   const [accountType, setAccountType] = useState<'bip44' | 'plain'>('bip44')
   const [text, setText] = useState('')
-  const [coinType, setCoinType] = useState<ImportAccountCoinType | ''>('')
+  const [coinType, setCoinType] = useState<ImportAccountCoinType | ''>('TFC')
 
   const onChangeFormat = (e: any) => {
     setFormat(e.target.value)
@@ -60,7 +60,7 @@ function ImportAccountActionView(props: {
       <FormControl>
         <FormLabel>Import Format</FormLabel>
         <RadioGroup value={format} onChange={onChangeFormat}>
-          <FormControlLabel value="mnemonic" control={<Radio />} label="Mnemonic" />
+          <FormControlLabel value="mnemonic" control={<Radio />} label="Mnemonic" disabled={accountType !== 'bip44'} />
           <FormControlLabel value="seed" control={<Radio />} label="Seed/Private Key" />
         </RadioGroup>
       </FormControl>

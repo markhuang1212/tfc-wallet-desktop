@@ -34,8 +34,8 @@ function AccountDetailBalance(props: { balance: string }) {
 function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string }) {
   return (
     <div style={{ marginTop: '24px' }}>
-      {props.pubKey && <Typography>Private Key: {props.privKey}</Typography>}
-      {props.privKey && <Typography>Public Key: {props.pubKey}</Typography>}
+      {props.privKey && <Typography>Private Key: {props.privKey}</Typography>}
+      {props.pubKey && <Typography>Public Key: {props.pubKey}</Typography>}
       {props.mnemonic && <Typography>Mnemonic: {props.mnemonic}</Typography>}
     </div>
   )
@@ -105,6 +105,8 @@ function AccountDetailView(props: AccountDetailViewProps) {
       ipcRenderer.invoke('get-balance', props.account.privKey, props.account.coinType!.abbrName, ercCoin).then(balance => setBalance(balance))
     } else if (props.account && props.account.accountType === 'bip44-sub-account') {
       ipcRenderer.invoke('get-balance', props.account.keys[accountIndex].privKey, props.account.coinType!.abbrName, ercCoin).then(balance => setBalance(balance))
+    } else {
+      setBalance(undefined)
     }
   }, [props.account, accountIndex])
 
