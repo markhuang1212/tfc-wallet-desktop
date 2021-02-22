@@ -102,7 +102,7 @@ function App() {
     }
 
     ipcRenderer.invoke('transfer-coin', txInfo).then(() => {
-      console.log('transfer success!')
+      alert('Transfer submitted! Check the balance after a few minutes')
     }).catch(() => {
       console.log('transfer failed.')
     })

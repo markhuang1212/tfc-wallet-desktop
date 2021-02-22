@@ -31,7 +31,7 @@ class AccountFunctionsProvider {
             return new Promise<void>((res, rej) => {
                 const account = new EthAccount(Buffer.from(txInfo.sender_privKey, 'hex'))
                 const event = this.ethChain.transfer(txInfo.receiver_address, txInfo.amount, account)
-                event.on('executed', () => {
+                event.on('pending', () => {
                     res()
                 })
                 event.on('error', () => {
