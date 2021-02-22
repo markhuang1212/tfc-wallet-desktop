@@ -26,6 +26,9 @@ function ImportAccountActionView(props: {
   }
 
   const onChangeAccountType = (e: any) => {
+    if (e.target.value === 'plain') {
+      setFormat('seed')
+    }
     setAccountType(e.target.value)
     props.onChange(format, e.target.value, coinType !== '' ? coinType : undefined, text)
   }
