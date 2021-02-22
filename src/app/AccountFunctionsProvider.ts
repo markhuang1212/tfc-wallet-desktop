@@ -15,6 +15,9 @@ class AccountFunctionsProvider {
             const balance = await this.ethChain.getBalance(account)
             return BigInt(balance.toString())
         }
+        if (coinType === 'ETH' && ercCoin === 'TFC') {
+            
+        }
         return 0n
     }
 
@@ -28,11 +31,11 @@ class AccountFunctionsProvider {
 
     transfer(txInfo: TxRequestInfo) {
         if (txInfo.coinType === 'ETH' && txInfo.ercCoin === 'ETH') {
-            return new Promise<void>((res, rej) => {
+            return new Promise<string>((res, rej) => {
                 const account = new EthAccount(Buffer.from(txInfo.sender_privKey, 'hex'))
                 const event = this.ethChain.transfer(txInfo.receiver_address, txInfo.amount, account)
-                event.on('pending', () => {
-                    res()
+                event.on('pending', (txHash: string) => {
+                    res(txHash)
                 })
                 event.on('error', () => {
                     rej()

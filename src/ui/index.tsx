@@ -101,8 +101,8 @@ function App() {
       ercCoin: ercCoin
     }
 
-    ipcRenderer.invoke('transfer-coin', txInfo).then(() => {
-      alert('Transfer submitted! Check the balance after a few minutes')
+    ipcRenderer.invoke('transfer-coin', txInfo).then((txHash:string) => {
+      alert(`Transfer submitted! Transaction Hash: ${txHash}. \n\n Please check the balance after a few minutes.`)
     }).catch(() => {
       console.log('transfer failed.')
     })

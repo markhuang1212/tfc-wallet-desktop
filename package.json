@@ -1,7 +1,7 @@
 {
     "name": "tfc-wallet-desktop",
     "version": "1.0.0",
-    "description": "",
+    "description": "A Multi-coin Crypto-currency wallet",
     "main": "dist/main.js",
     "scripts": {
         "test": "jest",
@@ -15,7 +15,7 @@
         "make": "electron-forge make"
     },
     "keywords": [],
-    "author": "",
+    "author": "TurboFil Team",
     "license": "ISC",
     "devDependencies": {
         "@electron-forge/cli": "^6.0.0-beta.54",

@@ -43,5 +43,6 @@ ipcMain.handle('remove-plain-account', async (event, accountId: string) => {
 })
 
 ipcMain.handle('transfer-coin', async (event, txInfo: TxRequestInfo) => {
-    await AccountFunctionsProvider.shared.transfer(txInfo)
+    const txHash = await AccountFunctionsProvider.shared.transfer(txInfo)
+    return txHash
 })

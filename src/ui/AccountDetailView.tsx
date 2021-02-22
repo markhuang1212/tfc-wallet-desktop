@@ -118,7 +118,6 @@ function AccountDetailView(props: AccountDetailViewProps) {
   }
 
   const onChooseIndex = (newIndex: number) => {
-    console.log(newIndex)
     setAccountIndex(newIndex)
     props.onChooseIndex(newIndex)
   }
