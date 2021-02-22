@@ -82,11 +82,12 @@ class WalletController {
                         accountName: 'ETH/ERC20',
                         accountType: 'bip44-sub-account',
                         keys: (() => {
-                            let keys: { privKey: string, pubKey: string }[] = []
+                            let keys: { privKey: string, pubKey: string, address: string }[] = []
                             for (let i = 0; i < 10; i++) {
                                 keys.push({
                                     privKey: this.wallet.coinWallets['60'].getBip44Account(i).privateKey.toString('hex'),
-                                    pubKey: this.wallet.coinWallets['60'].getBip44Account(i).publicKey
+                                    pubKey: this.wallet.coinWallets['60'].getBip44Account(i).publicKey,
+                                    address: this.wallet.coinWallets['60'].getBip44Account(i).address
                                 })
                             }
                             return keys
@@ -101,7 +102,7 @@ class WalletController {
                             for (let i = 0; i < 10; i++) {
                                 keys.push({
                                     privKey: this.wallet.coinWallets['599'].getBip44Account(i).privateKey.toString('hex'),
-                                    pubKey: this.wallet.coinWallets['599'].getBip44Account(i).publicKey
+                                    pubKey: this.wallet.coinWallets['599'].getBip44Account(i).publicKey,
                                 })
                             }
                             return keys
@@ -145,7 +146,6 @@ class WalletController {
                 accountId: uuidv4(),
                 accountName: 'Account',
                 accountType: 'plain',
-                // accountBalance: '0',
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
                 passPhrase: ['pass', 'phrase'],

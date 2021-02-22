@@ -8,7 +8,9 @@ import useBalance from "./useBalance";
 
 interface AccountDetailViewProps {
   account?: AccountData | Required<AccountData>['subAccounts'][number]
-  onRename: (newName: string) => any
+  onStartTransfer: () => any
+  onChooseIndex: (newIndex: number) => any
+  onChooseErcCoin: (newErcCoin: 'ETH' | 'TFC' | 'USDT') => any
 }
 
 const useStyle = makeStyles({
@@ -31,11 +33,12 @@ function AccountDetailBalance(props: { balance: string }) {
   )
 }
 
-function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string }) {
+function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string, address?: string }) {
   return (
     <div style={{ marginTop: '24px' }}>
-      {props.privKey && <Typography>Private Key: {props.privKey}</Typography>}
-      {props.pubKey && <Typography>Public Key: {props.pubKey}</Typography>}
+      {props.privKey && <Typography style={{ overflowWrap: 'break-word' }}>Private Key: {props.privKey}</Typography>}
+      {props.pubKey && <Typography style={{ overflowWrap: 'break-word' }}>Public Key: {props.pubKey}</Typography>}
+      {props.address && <Typography style={{ overflowWrap: 'break-word' }}>Address: {props.address}</Typography>}
       {props.mnemonic && <Typography>Mnemonic: {props.mnemonic}</Typography>}
     </div>
   )
@@ -95,7 +98,6 @@ function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: E
 function AccountDetailView(props: AccountDetailViewProps) {
 
   const classes = useStyle()
-  const [accountName, setAccountName] = useState('')
   const [ercCoin, setErcCoin] = useState<'ETH' | 'TFC' | 'USDT'>('ETH')
   const [balance, setBalance] = useState<bigint | undefined>(undefined)
   const [accountIndex, setAccountIndex] = useState(0)
@@ -112,11 +114,13 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
   const onChooseErcCoin = (coin: 'ETH' | 'TFC' | 'USDT') => {
     setErcCoin(coin)
+    props.onChooseErcCoin(coin)
   }
 
   const onChooseIndex = (newIndex: number) => {
     console.log(newIndex)
     setAccountIndex(newIndex)
+    props.onChooseIndex(newIndex)
   }
 
   return (
@@ -125,20 +129,25 @@ function AccountDetailView(props: AccountDetailViewProps) {
         <Toolbar>
           <Typography variant='h6'>TFC Wallet</Typography>
           <span style={{ flex: 1 }}></span>
-          {props.account && (<Button color="inherit">Transfer</Button>)}
+          {props.account && (<Button color="inherit" onClick={props.onStartTransfer}>Transfer</Button>)}
           <Button color="inherit" onClick={() => location.reload()}>Refresh</Button>
         </Toolbar>
       </AppBar>
       <Container maxWidth="sm">
         {props.account ?
+
           <div className={classes.content}>
             {props.account.coinType?.abbrName == 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
             {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
             {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
             <AccountDetailKeys
               pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : props.account.pubKey}
-              privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey} />
-          </div> :
+              privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey}
+              address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : props.account.address} />
+          </div>
+
+          :
+
           <div>
             <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>Select An Account</Typography>
           </div>

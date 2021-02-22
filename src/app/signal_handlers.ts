@@ -4,8 +4,8 @@
  */
 
 import { ipcMain } from 'electron'
-import { TxInfo } from '../Types'
-import AddressInfoProvider from './AddressInfoProvider'
+import { TxRequestInfo } from '../Types'
+import AccountFunctionsProvider from './AccountFunctionsProvider'
 import WalletController from './WalletController'
 
 ipcMain.handle('load-demo-data', async () => {
@@ -16,8 +16,13 @@ ipcMain.handle('get-accounts', async () => {
     return WalletController.shared.getAccounts()
 })
 
+ipcMain.handle('get-transactions', async (_, pubKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC') => {
+    const txs = await AccountFunctionsProvider.shared.getTransactions(pubKey, coinType, ercCoin)
+    return txs
+})
+
 ipcMain.handle('get-balance', async (_, privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
-    const balance = await AddressInfoProvider.shared.getBalance(privKey, coinType, ercCoin)
+    const balance = await AccountFunctionsProvider.shared.getBalance(privKey, coinType, ercCoin)
     return balance
 })
 
@@ -37,6 +42,6 @@ ipcMain.handle('remove-plain-account', async (event, accountId: string) => {
 
 })
 
-ipcMain.handle('transfer-coin', async (event, accountId: string, txInfo: TxInfo) => {
-
+ipcMain.handle('transfer-coin', async (event, txInfo: TxRequestInfo) => {
+    await AccountFunctionsProvider.shared.transfer(txInfo)
 })

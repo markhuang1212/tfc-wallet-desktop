@@ -2,9 +2,11 @@
  * Created by hm. Used in /app and /ui
  */
 
-interface TxInfo {
-    from: string
-    to: string
+interface TxRequestInfo {
+    sender_privKey: string,
+    receiver_address: string,
+    coinType: 'ETH' | 'BTC' | 'TFC',
+    ercCoin?: 'ETH' | 'TFC' | 'USDT'
     amount: bigint
 }
 
@@ -27,22 +29,19 @@ interface AccountData {
     subAccounts?: {
         accountType: 'bip44-sub-account'
         accountId: string,
-        // derivationPath: string
         accountName: string
-        // accountBalance?: string
         coinType: Coin
-        // txs?: TxInfo[]
-        // privKey: string
-        // pubKey: string
         keys: {
             privKey: string
             pubKey: string
+            address?: string
         }[]
     }[] // for bip44 accounts
 
     passPhrase: string[]
     privKey: string
     pubKey?: string
+    address?: string
 }
 
-export { AccountData, TxInfo, Coin }
+export { AccountData, TxRequestInfo, Coin }
