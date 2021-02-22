@@ -5,8 +5,7 @@ import {PromiEvent} from '@troubkit/tools';
 import axios, {AxiosResponse} from 'axios';
 import {EthAccount, TfcChainAccount} from '../../wallet';
 import {EthereumChain} from './ethereum';
-import {Endpoints} from '../defines';
-import retryTimes = jest.retryTimes;
+import config from '../../config';
 
 // eslint-disable-next-line require-jsdoc
 export class TfcBip44Chain extends Chain<CoinCode.TFC_BIP44> {
@@ -61,7 +60,7 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
 
   // eslint-disable-next-line require-jsdoc
   async getBalance(
-      accountOrAddress: AccountImplMapping[CoinCode.TFC_BIP44] | string,
+      accountOrAddress: AccountImplMapping[CoinCode.TFC_CHAIN] | string,
   ): Promise<BigInt> {
     let address: string;
     if (typeof accountOrAddress === 'string') {
@@ -81,9 +80,9 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
 
   // eslint-disable-next-line require-jsdoc
   transfer(
-      recipient: string | AccountImplMapping[CoinCode.TFC_BIP44],
+      recipient: string | AccountImplMapping[CoinCode.TFC_CHAIN],
       amount: BigInt,
-      sender: AccountImplMapping[CoinCode.TFC_BIP44],
+      sender: AccountImplMapping[CoinCode.TFC_CHAIN],
   ): PromiEvent<TransactionID, TxEvents> {
     return PromiEvent.reject(
         new Error('Transfer is not available on TFC-Chain'),
@@ -126,7 +125,8 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
             bridgeAccount: string,
             requiredTransferAmount: string,
           };
-            const ethChain = new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+            const ethChain =
+              new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint);
             ethChain.confirmationRequirement = 6;
             // pay transaction fee for exchange
             ethChain.transfer(
