@@ -1,9 +1,9 @@
 import {CoinWallet, EthAccount, Wallet, WalletJSON} from '../wallet';
 import {CoinCode} from '../defines';
-import {EthereumChain, TransferRecord} from '../blockchain';
-import {Endpoints} from '../blockchain/defines';
+import {EthereumChain, TfcChain, TransferRecord} from '../blockchain';
 import {Chain, TransactionID, TxEvents} from '../blockchain/chain';
 import {PromiEvent} from '@troubkit/tools';
+import config from '../config';
 
 describe('Examples for wallet', () => {
   test('Create wallet from mnemonic and get the first ETH account', () => {
@@ -83,14 +83,14 @@ describe('Examples for wallet', () => {
   });
 });
 
-describe('Examples for Blockchain', () => {
+describe('Examples for Ethereum', () => {
   const mnemonic = 'myth like bonus scare over problem client ' +
     'lizard pioneer submit female collect';
   const wallet: Wallet = Wallet.fromMnemonic(mnemonic);
 
   test('Get ETH balance of Ethereum account', async () => {
     const ethChain: Chain<CoinCode.ETH> =
-      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+      new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint);
     // get balance of an account
     const acc: EthAccount =
       wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0);
@@ -100,9 +100,10 @@ describe('Examples for Blockchain', () => {
 
   test('Get ERC20 balance of Ethereum account', async () => {
     const ethChain: EthereumChain =
-      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+      new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint);
     // get balance of ERC20
-    const erc20ContractAddress = '0x401Ef2b876Db2608e4A353800BBaD1E3e3Ea8B46';
+    const erc20ContractAddress =
+      config[CoinCode.ETH].rinkeby.contracts.TFC_ERC20;
     const acc: EthAccount =
       wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0);
     const balance: BigInt = await ethChain.erc20BalanceOf(
@@ -115,7 +116,7 @@ describe('Examples for Blockchain', () => {
 
   test('Transfer ETH', (done) => {
     const ethChain: EthereumChain =
-      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+      new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint);
     // the number of confirmation blocks needed to
     // consider a transaction is finalized
     ethChain.confirmationRequirement = 6;
@@ -151,11 +152,12 @@ describe('Examples for Blockchain', () => {
 
   test('Transfer ERC20', (done) => {
     const ethChain: EthereumChain =
-      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+      new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint);
     // the number of confirmation blocks needed to
     // consider a transaction is finalized
     ethChain.confirmationRequirement = 1;
-    const erc20ContractAddress = '0x401Ef2b876Db2608e4A353800BBaD1E3e3Ea8B46';
+    const erc20ContractAddress =
+      config[CoinCode.ETH].rinkeby.contracts.TFC_ERC20;
     // transfer ERC20
     const promiEvent: PromiEvent<TransactionID, TxEvents> =
       ethChain.erc20Transfer(
@@ -188,23 +190,76 @@ describe('Examples for Blockchain', () => {
     });
   }, 9999999);
 
-  test('Get list of ETH transfer records', async ()=>{
+  test('Get list of ETH transfer records', async () => {
     const ethChain: EthereumChain =
-      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+      new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint);
     const transferRecords: TransferRecord[] =
       await ethChain.getETHTransferRecordList(
           '0xD265C6c7487154803CdA1863A2ddeEcd76Ca2382', // account address
       );
     console.log(transferRecords);
   });
-  test('Get list of ERC20 transfer records', async ()=>{
+  test('Get list of ERC20 transfer records', async () => {
     const ethChain: EthereumChain =
-      new EthereumChain(Endpoints[CoinCode.ETH].rinkeby);
+      new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint);
     const transferRecords: TransferRecord[] =
       await ethChain.getErc20TransferRecordList(
           '0x401Ef2b876Db2608e4A353800BBaD1E3e3Ea8B46', // ERC20 contract
           '0xD265C6c7487154803CdA1863A2ddeEcd76Ca2382', // account address
       );
     console.log(transferRecords);
+  });
+});
+
+describe('Examples for TFC-Chain', () => {
+  test('get balance of TFC', async () => {
+    const tfcChain: TfcChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN]['9523'].endpoint);
+    const tfcAccount = Wallet.getAccount(CoinCode.TFC_CHAIN, Buffer.from(
+        '1374ded99e64cf8da7161e720f1e8e842bb1f44c0d061581299ec2e721419cf8',
+        'hex',
+    ));
+    const balance: BigInt = await tfcChain.getBalance(tfcAccount);
+    console.log('TFC balance of ' + tfcAccount.address + ': ' +
+      balance.toString(10));
+  });
+
+  test('exchange TFC to TFC-ERC20', (done) => {
+    const tfcChain: TfcChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN]['9523'].endpoint);
+    const tfcAccount = Wallet.getAccount(CoinCode.TFC_CHAIN, Buffer.from(
+        '1374ded99e64cf8da7161e720f1e8e842bb1f44c0d061581299ec2e721419cf8',
+        'hex',
+    ));
+
+    const ethAccount: EthAccount =
+      Wallet.getAccount(CoinCode.ETH, Buffer.from(
+          '4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
+          'hex',
+      ));
+
+    // The logic of exchange is:
+    // 1. pay exchange transaction fee to a bridge address
+    // 2. after the bridge receives the fee,
+    // it will automatically mint TFC-ERC20 tokens for the Ethereum address
+    const promiEvent = tfcChain.exchangeToErc20(
+        tfcAccount,
+        ethAccount,
+        BigInt(1),
+    );
+    promiEvent.on('transactionFeePaying', (txHash) => {
+      console.log('Paying exchange transaction fee...,' +
+        ' transaction hash = ' + txHash);
+    }).on('transactionFeePaid', (txHash) => {
+      console.log('Exchange fee paid, waiting for process,' +
+        ' transaction hash = ' + txHash);
+    }).on('erc20Minting', () => {
+      console.log('TFC-ERC20 mint transaction is submitted');
+    }).on('erc20Minted', ()=>{
+      console.log('TFC-ERC20 minted. Exchange finishes');
+    });
+    promiEvent.then(()=>{
+      console.log('TFC-ERC20 minted. Exchange finishes');
+    });
   });
 });
