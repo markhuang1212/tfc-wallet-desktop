@@ -5,7 +5,6 @@ import PersistentStorageController from "./PersistentStorageController";
 import v8 from 'v8'
 import { v4 as uuidv4 } from 'uuid'
 import { Wallet, WalletJSON } from "../core/wallet";
-import { CoinBTC, CoinETH, CoinTFC } from "../Const";
 import { CoinCode } from "../core/defines";
 
 interface WalletInfo {
@@ -44,15 +43,16 @@ class WalletController {
     loadWallet(seed: string): void;
     loadWallet(arg: any) {
         if (typeof arg === 'string') {
-            this.wallet = Wallet.fromSeed(arg)
+            this.wallet.seed = Buffer.from(arg, 'hex')
         } else if (typeof arg === 'object') {
             arg = (arg as string[]).join(' ')
-            this.wallet = Wallet.fromMnemonic(arg)
+            this.wallet.mnemonic = arg
             this.info.passphrase = arg
-            // this.infoPsc.
         } else {
             throw Error('Invalid argument')
         }
+        this.infoPsc.object = this.info
+        this.infoPsc.save()
         this.walletPsc.object = this.wallet.toJSON()
         this.walletPsc.save()
     }
@@ -93,7 +93,7 @@ class WalletController {
                             }
                             return keys
                         })(),
-                        coinType: CoinETH,
+                        coinType: 'ETH',
                     }, {
                         accountId: uuidv4(),
                         accountName: 'TFC',
@@ -109,11 +109,11 @@ class WalletController {
                             }
                             return keys
                         })(),
-                        coinType: CoinTFC
+                        coinType: 'TFC'
                     }
                 ],
                 privKey: this.wallet.privateKey.toString('hex'),
-                passPhrase: ['pass phrase']
+                passPhrase: 'pass phrase'
             })
         }
 
@@ -125,8 +125,7 @@ class WalletController {
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
                 address: account.address,
-                passPhrase: ['pass', 'phrase'],
-                coinType: CoinBTC
+                coinType: 'BTC'
             })
         })
 
@@ -138,8 +137,7 @@ class WalletController {
                 privKey: account.privateKey.toString('hex'),
                 address: account.address,
                 pubKey: account.publicKey,
-                passPhrase: ['pass', 'phrase'],
-                coinType: CoinETH
+                coinType: 'ETH'
             })
         })
 
@@ -151,8 +149,7 @@ class WalletController {
                 address: account.address,
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
-                passPhrase: ['pass', 'phrase'],
-                coinType: CoinBTC
+                coinType: 'BTC'
             })
         })
 

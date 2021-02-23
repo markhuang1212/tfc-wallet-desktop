@@ -20,8 +20,8 @@ function AccountListItem(props: AccountListItemProps) {
         style={{ padding: '8px 24px' }}
         selected={props.isFocused && subAccountIndex === -1}
         onClick={() => { props.onClick(); setSubAccountIndex(-1) }}>
-        <ListItemText primary={props.account.accountName} secondary={props.account.coinType?.abbrName ?? 'bip44'} />
-        {props.account.subAccounts && <ExpandMore />}
+        <ListItemText primary={props.account.accountName} secondary={(props.account as any).coinType?.abbrName ?? 'BIP44'} />
+        {(props.account as any).subAccounts && <ExpandMore />}
       </ListItem>
       {props.account.accountType === 'bip44-master' &&
         props.account.subAccounts!.map((account, i) => (
@@ -30,7 +30,7 @@ function AccountListItem(props: AccountListItemProps) {
             key={account.accountId}
             onClick={() => { setSubAccountIndex(i); props.onClick(i) }}
             selected={props.isFocused && subAccountIndex === i}>
-            <ListItemText primary={account.accountName} secondary={account.coinType?.abbrName} />
+            <ListItemText primary={account.accountName} secondary={account.coinType} />
           </ListItem>
         ))
       }

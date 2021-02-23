@@ -7,9 +7,6 @@ import { ipcMain } from 'electron'
 import { TxRequestInfo } from '../Types'
 import AccountFunctionsProvider from './AccountFunctionsProvider'
 import WalletController from './WalletController'
-import pino from 'pino'
-
-const logger = pino()
 
 ipcMain.handle('load-demo-data', async () => {
     console.log('Receive signal: load-demo-data')

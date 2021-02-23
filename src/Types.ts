@@ -10,38 +10,48 @@ interface TxRequestInfo {
     amount: bigint
 }
 
-interface Coin {
-    fullName: string
-    abbrName: string
-    identifier: number
-}
+// interface Coin {
+//     fullName: string
+//     abbrName: string
+//     identifier: number
+// }
 
-interface AccountData {
-    accountId: string, // the unique id for all accounts
-    accountName: string,
+type Coin = 'ETH' | 'BTC' | 'TFC'
+type Erc20Coin = 'ETH' | 'USDT' | 'TFC'
 
-    accountType: 'bip44-master' | 'plain',
+interface AccountDataPlain {
+    accountId: string
+    accountName: string
 
-    // accountBalance?: string // balance is cached
-    // txs?: TxInfo[] // txs is cached
-    coinType?: Coin // for plain account. Possible options: CoinBTC, CoinTFC, CoinETH, CoinUSDT
+    accountType: 'plain'
+    coinType: Coin
 
-    subAccounts?: {
-        accountType: 'bip44-sub-account'
-        accountId: string,
-        accountName: string
-        coinType: Coin
-        keys: {
-            privKey: string
-            pubKey: string
-            address?: string
-        }[]
-    }[] // for bip44 accounts
-
-    passPhrase: string[]
     privKey: string
-    pubKey?: string
-    address?: string
+    pubKey: string
+    address: string
 }
 
-export { AccountData, TxRequestInfo, Coin }
+interface AccountDataBip44SubAccount {
+    accountType: 'bip44-sub-account'
+    accountId: string
+    accountName: string
+    coinType: Coin
+    keys: {
+        privKey: string
+        pubKey: string
+        address: string
+    }[]
+}
+
+interface AccountDataBip44Master {
+    accountId: string
+    accountName: string
+    accountType: 'bip44-master'
+    subAccounts: AccountDataBip44SubAccount[]
+    privKey: string
+    passPhrase?: string
+}
+
+type AccountData = AccountDataBip44Master | AccountDataPlain
+
+export { AccountData, TxRequestInfo, Coin, Erc20Coin, AccountDataBip44Master, AccountDataBip44SubAccount, AccountDataPlain }

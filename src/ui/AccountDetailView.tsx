@@ -1,4 +1,4 @@
-import { AccountData } from "./../Types";
+import { AccountData, AccountDataBip44SubAccount, AccountDataPlain } from "./../Types";
 import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem, FormControlLabel } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport, Check } from '@material-ui/icons'
@@ -7,7 +7,7 @@ import { ipcRenderer, Menu } from "electron";
 import useBalance from "./useBalance";
 
 interface AccountDetailViewProps {
-  account?: AccountData | Required<AccountData>['subAccounts'][number]
+  account?: AccountData | AccountDataBip44SubAccount
   onStartTransfer: () => any
   onChooseIndex: (newIndex: number) => any
   onChooseErcCoin: (newErcCoin: 'ETH' | 'TFC' | 'USDT') => any
@@ -113,9 +113,9 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
   useEffect(() => {
     if (props.account && props.account.accountType === 'plain') {
-      ipcRenderer.invoke('get-balance', props.account.privKey, props.account.coinType!.abbrName, ercCoin).then(balance => setBalance(balance))
+      ipcRenderer.invoke('get-balance', props.account.privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
     } else if (props.account && props.account.accountType === 'bip44-sub-account') {
-      ipcRenderer.invoke('get-balance', props.account.keys[accountIndex].privKey, props.account.coinType!.abbrName, ercCoin).then(balance => setBalance(balance))
+      ipcRenderer.invoke('get-balance', props.account.keys[accountIndex].privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
     } else {
       setBalance(undefined)
     }
@@ -137,8 +137,8 @@ function AccountDetailView(props: AccountDetailViewProps) {
         <Toolbar>
           <Typography variant='h6'>TFC Wallet</Typography>
           <span style={{ flex: 1 }}></span>
-          {(props.account?.coinType?.abbrName === 'TFC') && <Button color="inherit" onClick={props.onStartSwap}>Swap</Button>}
-          {(props.account && props.account.accountType !== 'bip44-master' && props.account.coinType?.abbrName !== 'TFC') && (<Button color="inherit" onClick={props.onStartTransfer}>Transfer</Button>)}
+          {((props.account as AccountDataPlain | AccountDataBip44SubAccount | undefined)?.coinType === 'TFC') && <Button color="inherit" onClick={props.onStartSwap}>Swap</Button>}
+          {(props.account && props.account.accountType !== 'bip44-master' && props.account.coinType !== 'TFC') && (<Button color="inherit" onClick={props.onStartTransfer}>Transfer</Button>)}
           <Button color="inherit" onClick={() => location.reload()}>Refresh</Button>
         </Toolbar>
       </AppBar>
@@ -146,13 +146,13 @@ function AccountDetailView(props: AccountDetailViewProps) {
         {props.account ?
 
           <div className={classes.content}>
-            {props.account.coinType?.abbrName == 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
+            {(props.account as AccountDataPlain | AccountDataBip44SubAccount).coinType === 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
             {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
             {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
             <AccountDetailKeys
-              pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : props.account.pubKey}
+              pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : (props.account as AccountDataPlain).pubKey}
               privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey}
-              address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : props.account.address} />
+              address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : (props.account as AccountDataPlain).address} />
           </div>
 
           :
