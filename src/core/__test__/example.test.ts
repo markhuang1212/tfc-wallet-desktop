@@ -212,9 +212,18 @@ describe('Examples for Ethereum', () => {
 });
 
 describe('Examples for TFC-Chain', () => {
+  test('different cluster/blockchain', ()=>{
+    const tfcOpenbiChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint);
+    const tfcBlockchainfsChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN]['blockchainfs'].endpoint);
+    expect(tfcOpenbiChain).not.toBeNull();
+    expect(tfcBlockchainfsChain).not.toBeNull();
+  });
+
   test('get balance of TFC', async () => {
     const tfcChain: TfcChain =
-      new TfcChain(config[CoinCode.TFC_CHAIN]['9523'].endpoint);
+      new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint);
     const tfcAccount = Wallet.getAccount(CoinCode.TFC_CHAIN, Buffer.from(
         '1374ded99e64cf8da7161e720f1e8e842bb1f44c0d061581299ec2e721419cf8',
         'hex',
@@ -226,7 +235,7 @@ describe('Examples for TFC-Chain', () => {
 
   test('exchange TFC to TFC-ERC20', (done) => {
     const tfcChain: TfcChain =
-      new TfcChain(config[CoinCode.TFC_CHAIN]['9523'].endpoint);
+      new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint);
     const tfcAccount = Wallet.getAccount(CoinCode.TFC_CHAIN, Buffer.from(
         '1374ded99e64cf8da7161e720f1e8e842bb1f44c0d061581299ec2e721419cf8',
         'hex',
@@ -260,6 +269,7 @@ describe('Examples for TFC-Chain', () => {
     });
     promiEvent.then(()=>{
       console.log('TFC-ERC20 minted. Exchange finishes');
+      done();
     });
   });
 });
