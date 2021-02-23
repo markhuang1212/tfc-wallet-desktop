@@ -77,7 +77,7 @@ describe('wallet', () => {
         .toThrow('not supported');
   });
 
-  test('should get account from static methods', ()=>{
+  test('should get account from static methods', () => {
     const mnemonic = 'myth like bonus scare over problem client ' +
       'lizard pioneer submit female collect';
     const seed = bip39.mnemonicToSeedSync(mnemonic);
@@ -91,5 +91,39 @@ describe('wallet', () => {
     expect(Wallet.getAccount(
         seed.toString('hex'), CoinCode.BTC, 'm/0\'/0/0').address)
         .toEqual(acc0.address);
+  });
+
+  test('should be able to reset seed', () => {
+    const wallet = new Wallet(Buffer.from([0, 1, 2, 3]));
+    expect(wallet.mnemonic).toBeUndefined();
+    expect(wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0).address)
+        .not.toEqual('0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1');
+    wallet.seed = Buffer.from(
+        // eslint-disable-next-line max-len
+        '15e7bbc6ac54a721ad440f8ef7d1fa7c4f77ae5ec71e24187649e9d228022655b9e6fb3659f8e4b2274ac3b1955bf9e58f150492c44e7aa161095ba0ad926e9e',
+        'hex',
+    );
+    expect(wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0).address)
+        .toEqual('0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1');
+  });
+
+  test('should be able to reset mnemonic', () => {
+    const mnemonic ='dumb range venue feel three miss nominee punch ' +
+      'bonus bubble stamp cook buyer legend water';
+    const wallet = new Wallet(mnemonic);
+    expect(wallet.mnemonic).toEqual(mnemonic);
+    expect(wallet.seed.toString('hex')).toEqual(
+        // eslint-disable-next-line max-len
+        '9f25090175f17c4818ca7d87e0a1ea1198a2490a55e50e2fdccf023f6f28049e3e61289bdadf0f154cd92df50b1fe5d382bd6a5dce7cbc0a7d06ffebf3bb830e',
+    );
+    expect(wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0).address)
+        .toEqual('0xDe4bc9bd3DF3a13680dd9B4D14C1a48D01Ef25ca');
+
+    const newMnemonic = 'myth like bonus scare over problem client ' +
+      'lizard pioneer submit female collect';
+    wallet.mnemonic = newMnemonic;
+    expect(wallet.mnemonic).toEqual(newMnemonic);
+    expect(wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0).address)
+        .toEqual('0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1');
   });
 });

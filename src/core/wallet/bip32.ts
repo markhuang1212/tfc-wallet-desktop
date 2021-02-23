@@ -5,7 +5,7 @@ import HDNode from 'hdkey';
 export class HDWallet {
   // eslint-disable-next-line require-jsdoc
   constructor(
-    protected hdNode: HDNode,
+    public hdNode: HDNode,
   ) {
   }
 
