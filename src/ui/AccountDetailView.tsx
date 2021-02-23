@@ -11,6 +11,7 @@ interface AccountDetailViewProps {
   onStartTransfer: () => any
   onChooseIndex: (newIndex: number) => any
   onChooseErcCoin: (newErcCoin: 'ETH' | 'TFC' | 'USDT') => any
+  onStartSwap: () => any
 }
 
 const useStyle = makeStyles({
@@ -23,6 +24,10 @@ const useStyle = makeStyles({
     paddingTop: '24px'
   }
 })
+
+function AccountDetailRename(props: { onRename: (newName: string) => any }) {
+
+}
 
 function AccountDetailBalance(props: { balance: string }) {
   return (
@@ -85,14 +90,18 @@ function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: E
 
   return (
     <FormControl variant="outlined">
-      <InputLabel>ETH/ERC20 Coin</InputLabel>
-      <Select value={coin} onChange={onChoose}>
+      <InputLabel id="ETH-ERC20-Coin-Select-Label">ETH/ERC20 Coin</InputLabel>
+      <Select labelId="ETH-ERC20-Coin-Select-Label" value={coin} onChange={onChoose}>
         <MenuItem value="ETH">ETH</MenuItem>
         <MenuItem value="USDT">USDT</MenuItem>
         <MenuItem value="TFC">TFC</MenuItem>
       </Select>
     </FormControl>
   )
+}
+
+function AccountDetailFurtherAction() {
+
 }
 
 function AccountDetailView(props: AccountDetailViewProps) {
@@ -110,7 +119,7 @@ function AccountDetailView(props: AccountDetailViewProps) {
     } else {
       setBalance(undefined)
     }
-  }, [props.account, accountIndex])
+  }, [props.account, accountIndex, ercCoin])
 
   const onChooseErcCoin = (coin: 'ETH' | 'TFC' | 'USDT') => {
     setErcCoin(coin)
@@ -128,7 +137,8 @@ function AccountDetailView(props: AccountDetailViewProps) {
         <Toolbar>
           <Typography variant='h6'>TFC Wallet</Typography>
           <span style={{ flex: 1 }}></span>
-          {props.account && (<Button color="inherit" onClick={props.onStartTransfer}>Transfer</Button>)}
+          {(props.account?.coinType?.abbrName === 'TFC') && <Button color="inherit" onClick={props.onStartSwap}>Swap</Button>}
+          {(props.account && props.account.accountType !== 'bip44-master' && props.account.coinType?.abbrName !== 'TFC') && (<Button color="inherit" onClick={props.onStartTransfer}>Transfer</Button>)}
           <Button color="inherit" onClick={() => location.reload()}>Refresh</Button>
         </Toolbar>
       </AppBar>

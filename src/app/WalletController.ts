@@ -9,9 +9,12 @@ import { CoinBTC, CoinETH, CoinTFC } from "../Const";
 import { CoinCode } from "../core/defines";
 
 interface WalletInfo {
-    passphrase?: string[]
-    accountIndexes: {
-        [key in 'ETH' | 'BTC' | 'TFC']: number
+    passphrase?: string
+    // accountIndexes: {
+    //     [key in 'ETH' | 'BTC' | 'TFC']: number
+    // }
+    accountAliases: {
+        [key: string]: string
     }
 }
 
@@ -31,10 +34,6 @@ class WalletController {
 
     static shared = new WalletController()
 
-    async transfer(accountId: string, destination: string, amount: bigint) {
-
-    }
-
     loadDemoData() {
         this.wallet = Wallet.fromSeed('0x123456789')
         this.walletPsc.object = this.wallet.toJSON()
@@ -49,6 +48,8 @@ class WalletController {
         } else if (typeof arg === 'object') {
             arg = (arg as string[]).join(' ')
             this.wallet = Wallet.fromMnemonic(arg)
+            this.info.passphrase = arg
+            // this.infoPsc.
         } else {
             throw Error('Invalid argument')
         }
@@ -98,11 +99,12 @@ class WalletController {
                         accountName: 'TFC',
                         accountType: 'bip44-sub-account',
                         keys: (() => {
-                            let keys: { privKey: string, pubKey: string }[] = []
+                            let keys: { privKey: string, pubKey: string, address: string }[] = []
                             for (let i = 0; i < 10; i++) {
                                 keys.push({
                                     privKey: this.wallet.coinWallets['599'].getBip44Account(i).privateKey.toString('hex'),
                                     pubKey: this.wallet.coinWallets['599'].getBip44Account(i).publicKey,
+                                    address: this.wallet.coinWallets['599'].getBip44Account(i).address
                                 })
                             }
                             return keys
@@ -120,9 +122,9 @@ class WalletController {
                 accountId: uuidv4(),
                 accountName: 'Account',
                 accountType: 'plain',
-                // accountBalance: '0',
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
+                address: account.address,
                 passPhrase: ['pass', 'phrase'],
                 coinType: CoinBTC
             })
@@ -133,8 +135,8 @@ class WalletController {
                 accountId: uuidv4(),
                 accountName: 'Account',
                 accountType: 'plain',
-                // accountBalance: '0',
                 privKey: account.privateKey.toString('hex'),
+                address: account.address,
                 pubKey: account.publicKey,
                 passPhrase: ['pass', 'phrase'],
                 coinType: CoinETH
@@ -146,6 +148,7 @@ class WalletController {
                 accountId: uuidv4(),
                 accountName: 'Account',
                 accountType: 'plain',
+                address: account.address,
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
                 passPhrase: ['pass', 'phrase'],
@@ -173,13 +176,13 @@ class WalletController {
             this.info = this.infoPsc.getObjectCopy()!
         } else {
             this.info = {
-                passphrase: [],
-                accountIndexes: {
-                    'BTC': 0,
-                    'ETH': 0,
-                    'TFC': 0
+                passphrase: undefined,
+                accountAliases: {
+
                 }
             }
+            this.infoPsc.object = this.info
+            this.infoPsc.save()
         }
 
     }

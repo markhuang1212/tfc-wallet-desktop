@@ -28,8 +28,12 @@ function TransferView(props: TransferViewProps) {
                 <TextField label="Amount" value={amount} onChange={onChangeAmount}></TextField>
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.onCancel}>Cancel</Button>
-                <Button onClick={() => props.onTransfer(recipient, amount)}>Confirm</Button>
+                <Button onClick={props.onCancel} color="primary">Cancel</Button>
+                <Button color="primary" disabled={amount === '' && recipient === ''} onClick={() => {
+                    props.onTransfer(recipient, amount)
+                    setRecipient('')
+                    setAmount('')
+                }}>Confirm</Button>
             </DialogActions>
         </Dialog>
     )

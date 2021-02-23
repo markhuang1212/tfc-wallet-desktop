@@ -7,14 +7,19 @@ import ImportAccountView from './ImportAccountVIew';
 import { ipcRenderer } from 'electron';
 import '@fontsource/roboto'
 import TransferView from './TransferView';
+import SwapView from './SwapView';
 
 function App() {
   const [isImportingAccount, setIsImportingAccount] = useState(false)
+  const [isTransferring, setIsTransferring] = useState(false)
+  const [isSwapping, setIsSwapping] = useState(false)
+
   const [accountData, setAccountData] = useState<AccountData[]>([])
+
   const [accountDetailData, setAccountDetailData] = useState<AccountData | undefined | Required<AccountData>['subAccounts'][0]>(undefined)
   const [accountIndex, setAccountIndex] = useState(0)
   const [ercCoin, setErcCoin] = useState<'ETH' | 'TFC' | 'USDT'>('ETH')
-  const [isTransferring, setIsTransferring] = useState(false)
+
 
   useEffect(() => {
     ipcRenderer.invoke('get-accounts').then(accountData => {
@@ -32,6 +37,24 @@ function App() {
 
   const onChooseErcCoin = (newCoin: 'ETH' | 'TFC' | 'USDT') => {
     setErcCoin(newCoin)
+  }
+
+  const onSwap = (destination: string, amount: string) => {
+    if (accountDetailData) {
+      let from_privKey = ''
+      if (accountDetailData.accountType === 'bip44-sub-account') {
+        from_privKey = accountDetailData.keys[accountIndex].privKey
+      }
+      if (accountDetailData.accountType === 'plain') {
+        from_privKey = accountDetailData.privKey
+      }
+      ipcRenderer.invoke('swap-tfc', from_privKey, destination, BigInt(amount)).then((txHash: string) => {
+        alert(`Swap Succeed! Transaction Hash: ${txHash}`)
+      }).catch((e) => {
+        console.error(e)
+        alert(`Swap Failed.`)
+      })
+    }
   }
 
   const onImportAccount = async (
@@ -101,10 +124,10 @@ function App() {
       ercCoin: ercCoin
     }
 
-    ipcRenderer.invoke('transfer-coin', txInfo).then((txHash:string) => {
+    ipcRenderer.invoke('transfer-coin', txInfo).then((txHash: string) => {
       alert(`Transfer submitted! Transaction Hash: ${txHash}. \n\n Please check the balance after a few minutes.`)
     }).catch(() => {
-      console.log('transfer failed.')
+      alert(`Transfer Failed! Please try again later.`)
     })
 
   }
@@ -127,13 +150,16 @@ function App() {
     <AccountDetailView account={accountDetailData}
       onStartTransfer={() => setIsTransferring(true)}
       onChooseIndex={onChooseAccountIndex}
-      onChooseErcCoin={onChooseErcCoin} />
+      onChooseErcCoin={onChooseErcCoin}
+      onStartSwap={() => setIsSwapping(true)} />
 
     <ImportAccountView visible={isImportingAccount}
       onCancel={() => setIsImportingAccount(false)}
       onImportAccount={onImportAccount} />
 
     <TransferView visible={isTransferring} onCancel={() => setIsTransferring(false)} onTransfer={onTransfer} />
+
+    <SwapView visible={isSwapping} onCancel={() => setIsSwapping(false)} onSwap={onSwap} />
 
   </div>);
 }
