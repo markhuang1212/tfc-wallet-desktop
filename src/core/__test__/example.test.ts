@@ -81,6 +81,32 @@ describe('Examples for wallet', () => {
         .getStandaloneAccount(0)?.address)
         .toEqual('0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1');
   });
+
+  test('Set wallet mnemonic to a new one', ()=>{
+    const oldMnemonic = 'dumb range venue feel three miss nominee ' +
+      'punch bonus bubble stamp cook buyer legend water';
+    const wallet = Wallet.fromMnemonic(oldMnemonic);
+    const standalonePrivateKey: string =
+      '4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d';
+    // import private key to the wallet
+    wallet.getCoinWallet(CoinCode.ETH)
+        .addStandaloneAccounts(standalonePrivateKey);
+    expect(wallet.getCoinWallet(CoinCode.ETH).getStandaloneAccount(0)!.address)
+        .toEqual('0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1');
+    expect(wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0).address)
+        .toEqual('0xDe4bc9bd3DF3a13680dd9B4D14C1a48D01Ef25ca');
+
+    // change mnemonic
+    // (similar to change seed: wallet.seed = Buffer.from('0x12', 'hex') )
+    wallet.mnemonic = 'valve minor tent finger smooth intact slam ' +
+      'shoe slight solve sausage february wall soon huge';
+    // standalone accounts is preserved
+    expect(wallet.getCoinWallet(CoinCode.ETH).getStandaloneAccount(0)!.address)
+        .toEqual('0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1');
+    // bip44 account is changed
+    expect(wallet.getCoinWallet(CoinCode.ETH).getBip44Account(0).address)
+        .toEqual('0xEE615c350491fC0996Baa823328eaCb231067A1a');
+  });
 });
 
 describe('Examples for Ethereum', () => {
@@ -212,9 +238,18 @@ describe('Examples for Ethereum', () => {
 });
 
 describe('Examples for TFC-Chain', () => {
+  test('different cluster/blockchain', ()=>{
+    const tfcOpenbiChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint);
+    const tfcBlockchainfsChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN]['blockchainfs'].endpoint);
+    expect(tfcOpenbiChain).not.toBeNull();
+    expect(tfcBlockchainfsChain).not.toBeNull();
+  });
+
   test('get balance of TFC', async () => {
     const tfcChain: TfcChain =
-      new TfcChain(config[CoinCode.TFC_CHAIN]['9523'].endpoint);
+      new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint);
     const tfcAccount = Wallet.getAccount(CoinCode.TFC_CHAIN, Buffer.from(
         '1374ded99e64cf8da7161e720f1e8e842bb1f44c0d061581299ec2e721419cf8',
         'hex',
@@ -226,7 +261,7 @@ describe('Examples for TFC-Chain', () => {
 
   test('exchange TFC to TFC-ERC20', (done) => {
     const tfcChain: TfcChain =
-      new TfcChain(config[CoinCode.TFC_CHAIN]['9523'].endpoint);
+      new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint);
     const tfcAccount = Wallet.getAccount(CoinCode.TFC_CHAIN, Buffer.from(
         '1374ded99e64cf8da7161e720f1e8e842bb1f44c0d061581299ec2e721419cf8',
         'hex',
@@ -260,6 +295,7 @@ describe('Examples for TFC-Chain', () => {
     });
     promiEvent.then(()=>{
       console.log('TFC-ERC20 minted. Exchange finishes');
+      done();
     });
   });
 });

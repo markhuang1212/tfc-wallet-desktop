@@ -1,11 +1,12 @@
 import {TfcChain} from '../tfc';
-import {Endpoints} from '../../defines';
 import {CoinCode} from '../../../defines';
 import {Wallet} from '../../../wallet';
+import config from '../../../config';
 
 describe('TFC-Chain', () => {
   test('should get balance correctly', async () => {
-    const tfcChain = new TfcChain(Endpoints[CoinCode.TFC_CHAIN]['9523']);
+    const tfcChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN].blockchainfs.endpoint);
     const balance = await tfcChain.getBalance(
         '142JB9iSAzUDpPN1nEfSqqvEcFqWouHxA3',
     );
@@ -13,7 +14,8 @@ describe('TFC-Chain', () => {
   });
 
   test.skip('should exchange to erc20', (done) => {
-    const tfcChain = new TfcChain(Endpoints[CoinCode.TFC_CHAIN]['9523']);
+    const tfcChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN].blockchainfs.endpoint);
     tfcChain.exchangeToErc20(
         '14wW9abVreagLW1gDWo9F4UziqEEJnBJ5K',
         Wallet.getAccount(CoinCode.ETH, Buffer.from(
@@ -35,10 +37,11 @@ describe('TFC-Chain', () => {
   }, 9999999);
 
   test('should get exchange record correctly', async ()=>{
-    const tfcChain = new TfcChain(Endpoints[CoinCode.TFC_CHAIN]['9523']);
+    const tfcChain =
+      new TfcChain(config[CoinCode.TFC_CHAIN].blockchainfs.endpoint);
     const records = await tfcChain.getExchangeRecords(
         '14wW9abVreagLW1gDWo9F4UziqEEJnBJ5K',
     );
-    expect(records.length).toBeGreaterThan(0);
+    expect(records.length).toBeGreaterThanOrEqual(0);
   });
 });

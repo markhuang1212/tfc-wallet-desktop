@@ -18,7 +18,7 @@ export class CoinWallet<C extends CoinCode> extends HDWallet {
 
   // eslint-disable-next-line require-jsdoc
   constructor(
-    public readonly hdNode: HDNode,
+      hdNode: HDNode,
     public readonly coinCode: C,
     ...standalonePrivateKeys: Buffer[]
   ) {

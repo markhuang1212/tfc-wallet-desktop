@@ -21,12 +21,21 @@ export class Wallet extends HDWallet {
   // @ts-ignore
   readonly coinWallets: { [C in CoinCode]: CoinWallet<C> } = {};
 
+  private _mnemonic: string | undefined;
+  private _seed: Buffer;
+
   // eslint-disable-next-line require-jsdoc
   constructor(
-    public readonly seed: Buffer,
-    coinWallets: { [C in CoinCode]?: CoinWalletJSON<C> } = {},
+      seedOrMnemonic: Buffer | string,
+      coinWallets: { [C in CoinCode]?: CoinWalletJSON<C> } = {},
   ) {
-    super(HDNode.fromMasterSeed(seed).derive('m/44\''));
+    super(HDNode.fromMasterSeed(
+        Wallet.parseSeedOrMnemonic(seedOrMnemonic).seed).derive('m/44\''),
+    );
+    const parseResult = Wallet.parseSeedOrMnemonic(seedOrMnemonic);
+    this._seed = parseResult.seed;
+    this._mnemonic = parseResult.mnemonic;
+
     for (const coinName in CoinCode) {
       if (!CoinCode.hasOwnProperty(coinName)) {
         continue;
@@ -46,6 +55,98 @@ export class Wallet extends HDWallet {
             coinType,
         );
       }
+    }
+  }
+
+  /**
+   * Getter for seed of the wallet
+   *
+   * @return {Buffer}
+   */
+  get seed(): Buffer {
+    return this._seed;
+  }
+
+  /**
+   * Setter for seed of the wallet
+   *
+   * @param {Buffer} seed
+   */
+  set seed(seed: Buffer) {
+    this._seed = Wallet.parseSeedOrMnemonic(seed).seed;
+    this._mnemonic = undefined;
+    this.updateBip44WalletSeed();
+  }
+
+  /**
+   * Getter for mnemonic
+   *
+   * @return {string | undefined} null if the wallet is created directly
+   * with seed (without mnemonic)
+   */
+  get mnemonic(): string | undefined {
+    return this._mnemonic;
+  }
+
+  /**
+   * Setter for mnemonic
+   *
+   * @param {string} mnemonic
+   */
+  set mnemonic(mnemonic: string | undefined) {
+    if (!mnemonic) {
+      return;
+    }
+    this._mnemonic = mnemonic;
+    this._seed = Wallet.mnemonicToPrivateKey(mnemonic);
+    this.updateBip44WalletSeed();
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  private updateBip44WalletSeed() {
+    this.hdNode = HDNode.fromMasterSeed(this._seed).derive('m/44\'');
+    // change all coin wallets
+    for (const coinName in CoinCode) {
+      if (!CoinCode.hasOwnProperty(coinName)) {
+        continue;
+      }
+      const coinType = CoinCode[coinName] as unknown as CoinCode;
+      if (!CoinDefines.hasOwnProperty(coinType)) {
+        continue;
+      }
+      const coinWallet = this.coinWallets[coinType];
+      coinWallet.hdNode =this.hdNode.derive(`m/${coinType}'`);
+    }
+  }
+
+  // eslint-disable-next-line require-jsdoc
+  private static parseSeedOrMnemonic(
+      seedOrMnemonic: Buffer | string,
+  ): {
+    seed: Buffer,
+    mnemonic: string | undefined,
+  } {
+    if (Buffer.isBuffer(seedOrMnemonic)) {
+      return {
+        seed: seedOrMnemonic,
+        mnemonic: undefined,
+      };
+    }
+    seedOrMnemonic = seedOrMnemonic.trim();
+    if (seedOrMnemonic.startsWith('0x')) {
+      seedOrMnemonic = seedOrMnemonic.slice(2);
+    }
+    if (/^[0-9a-zA-Z]+$/.test(seedOrMnemonic)) {
+      // hex seed
+      return {
+        seed: Buffer.from(seedOrMnemonic, 'hex'),
+        mnemonic: undefined,
+      };
+    } else {
+      return {
+        seed: Wallet.mnemonicToPrivateKey(seedOrMnemonic),
+        mnemonic: seedOrMnemonic,
+      };
     }
   }
 
@@ -84,8 +185,7 @@ export class Wallet extends HDWallet {
 
   // eslint-disable-next-line require-jsdoc
   static fromMnemonic(mnemonic: string): Wallet {
-    const privateKey = Wallet.mnemonicToPrivateKey(mnemonic);
-    return new Wallet(privateKey);
+    return new Wallet(mnemonic);
   }
 
   // eslint-disable-next-line require-jsdoc
