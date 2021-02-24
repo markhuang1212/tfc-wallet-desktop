@@ -1,5 +1,4 @@
 import { EthereumChain, TfcChain } from "../core/blockchain"
-import { Endpoints } from "../core/blockchain/defines"
 import config from "../core/config"
 import { CoinCode } from "../core/defines"
 import { EthAccount, TfcChainAccount, Wallet } from "../core/wallet"
