@@ -171,7 +171,7 @@ class WalletController {
                 address: account.address,
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
-                coinType: 'BTC'
+                coinType: 'TFC'
             })
         })
 

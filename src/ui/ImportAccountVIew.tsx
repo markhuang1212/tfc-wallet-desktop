@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField } from '@material-ui/core'
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Typography } from '@material-ui/core'
 
 interface ImportAccountViewProps {
   visible: boolean
@@ -52,6 +52,9 @@ function ImportAccountActionView(props: {
           <FormControlLabel value="plain" control={<Radio />} label="Standalone Account" />
         </RadioGroup>
       </FormControl>
+      <Typography variant="body2" style={{ marginBottom: '16px' }} color="textSecondary">
+        BIP44 Account enables you to have multiple crypto-currency coins and addresses in one single account.
+      </Typography>
       <FormControl style={{ display: accountType === 'plain' ? 'block' : 'none' }}>
         <FormLabel>Coin Type</FormLabel>
         <RadioGroup value={coinType} onChange={onChangeCoinType}>
@@ -68,6 +71,9 @@ function ImportAccountActionView(props: {
         </RadioGroup>
       </FormControl>
       <TextField label={format} value={text} onChange={onChangeTextInput}></TextField>
+      <Typography variant="body2" style={{ marginBottom: '16px' }} color="textSecondary">
+        If you want to generate a new account, leave this field empty.
+      </Typography>
     </DialogContent>
   )
 }

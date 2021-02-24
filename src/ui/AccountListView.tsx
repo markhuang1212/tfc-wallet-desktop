@@ -21,7 +21,6 @@ function AccountListView(props: AccountListViewProps) {
 
   return (
     <div style={{
-      // backgroundColor: 'lightgray',
       flex: 0,
       minWidth: '280px',
       display: 'flex',

@@ -46,6 +46,7 @@ function App() {
   }
 
   const onSwap = (destination: string, amount: string) => {
+    setIsSwapping(false)
     if (accountDetailData) {
       let from_privKey = ''
       if (accountDetailData.accountType === 'bip44-sub-account') {

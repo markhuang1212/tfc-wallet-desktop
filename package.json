@@ -9,7 +9,7 @@
         "lint": "eslint 'src/**/*' --fix --ext .tx,.tsx,.js,.jsx ",
         "lint:core": "eslint 'src/core/**/*' --fix --ext .tx,.tsx,.js,.jsx ",
         "dev": "webpack serve",
-        "start": "APP_ENV=development electron . | pino-prettier",
+        "start": "APP_ENV=development electron .",
         "build": "webpack",
         "package": "electron-forge package",
         "make": "electron-forge make"

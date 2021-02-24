@@ -40,7 +40,7 @@ function AccountDetailRename(props: { name: string, onRename: (newName: string) 
   }, [props.name])
 
   return (
-    <FormControl variant="outlined">
+    <FormControl variant="outlined" style={{ margin: '16px 0px' }}>
       <InputLabel>Account Name</InputLabel>
       <OutlinedInput
         label="Account Name"
@@ -57,7 +57,7 @@ function AccountDetailRename(props: { name: string, onRename: (newName: string) 
 
 function AccountDetailBalance(props: { balance: string }) {
   return (
-    <div>
+    <div style={{ margin: '16px 0px' }}>
       <Typography variant="subtitle1">Balance</Typography>
       <Typography variant="h2">{props.balance}</Typography>
     </div>
@@ -66,7 +66,7 @@ function AccountDetailBalance(props: { balance: string }) {
 
 function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string, address?: string }) {
   return (
-    <div style={{ marginTop: '24px' }}>
+    <div style={{ margin: '16px 0px' }}>
       {props.privKey && <Typography style={{ overflowWrap: 'break-word' }}>Private Key: {props.privKey}</Typography>}
       {props.pubKey && <Typography style={{ overflowWrap: 'break-word' }}>Public Key: {props.pubKey}</Typography>}
       {props.address && <Typography style={{ overflowWrap: 'break-word' }}>Address: {props.address}</Typography>}
@@ -84,9 +84,9 @@ function AccountDetailChooseIndex(props: { index: number, onChoose: (newIndex: n
   }
 
   return (
-    <FormControl variant="outlined" style={{ marginTop: '24px' }}>
+    <FormControl variant="outlined" style={{ margin: '16px 0px' }}>
       <InputLabel>Account Index</InputLabel>
-      <Select value={index} onChange={onChangeIndex}>
+      <Select value={index} onChange={onChangeIndex} label="Account Index">
         {
           [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(v => (
             <MenuItem value={v} key={v}>{v}</MenuItem>
@@ -115,9 +115,9 @@ function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: E
   }, [props.coin])
 
   return (
-    <FormControl variant="outlined">
-      <InputLabel id="ETH-ERC20-Coin-Select-Label">ETH/ERC20 Coin</InputLabel>
-      <Select labelId="ETH-ERC20-Coin-Select-Label" value={coin} onChange={onChoose}>
+    <FormControl variant="outlined" style={{ margin: '16px 0px' }}>
+      <InputLabel>ETH/ERC20 Coin</InputLabel>
+      <Select label="ETH/ERC20 Coin" value={coin} onChange={onChoose}>
         <MenuItem value="ETH">ETH</MenuItem>
         <MenuItem value="USDT">USDT</MenuItem>
         <MenuItem value="TFC">TFC</MenuItem>
@@ -126,8 +126,14 @@ function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: E
   )
 }
 
-function AccountDetailFurtherAction() {
-
+function AccountDetailFurtherAction(props: { onRemove: () => any }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '16px' }}>
+      <Button onClick={props.onRemove}>
+        <Typography color="error">Remove Account</Typography>
+      </Button>
+    </div>
+  )
 }
 
 function AccountDetailView(props: AccountDetailViewProps) {
@@ -172,22 +178,36 @@ function AccountDetailView(props: AccountDetailViewProps) {
         {props.account ?
 
           <div className={classes.content}>
+
             {(props.account.accountType === 'bip44-master' || props.account.accountType === 'plain') &&
               <AccountDetailRename name={props.account.accountName} onRename={props.onRename} />}
+
             {(props.account as AccountDataPlain | AccountDataBip44SubAccount).coinType === 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
+
             {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
+
             {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
+
             <AccountDetailKeys
               pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : (props.account as AccountDataPlain).pubKey}
               privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey}
               address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : (props.account as AccountDataPlain).address} />
+
+            <AccountDetailFurtherAction onRemove={() => { }} />
+
           </div>
 
           :
 
           <div>
-            <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>Select An Account</Typography>
+            <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>
+              Select An Account
+            </Typography>
+            <Typography variant="body1" color="textSecondary" align="center" style={{ marginTop: '16px' }}>
+              You can create or import account in the wallet.
+            </Typography>
           </div>
+
         }
       </Container>
     </div>

@@ -52,11 +52,13 @@ ipcMain.handle('remove-plain-account', async (event, account_addr: string) => {
 })
 
 ipcMain.handle('swap-tfc', async (_, from_privKey: string, to_privKey: string, amount: bigint) => {
+    console.log(`Receive signal: swap TFC, from: ${from_privKey}, to_privKey: ${to_privKey}, amount: ${amount} `)
     const txHash = await AccountFunctionsProvider.shared.swapTfc(from_privKey, to_privKey, amount)
     return txHash
 })
 
 ipcMain.handle('transfer-coin', async (event, txInfo: TxRequestInfo) => {
+    console.log(`Receive signal: transfer coin, from: ${txInfo.sender_privKey}, to: ${txInfo.receiver_address}, amount: ${txInfo.amount}, coinType: ${txInfo.coinType}, ercCoin: ${txInfo.ercCoin}`)
     const txHash = await AccountFunctionsProvider.shared.transfer(txInfo)
     return txHash
 })

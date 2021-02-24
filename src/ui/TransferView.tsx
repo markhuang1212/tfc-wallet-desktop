@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@material-ui/core";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@material-ui/core";
 import { useState } from "react";
 import { AccountData } from "./../Types";
 
