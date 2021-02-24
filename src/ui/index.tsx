@@ -149,7 +149,7 @@ function App() {
     right: '0px',
     bottom: '0px',
     left: '0pt',
-    overflow: 'hidden'
+    // overflow: 'hidden'
   }}>
     <AccountListView
       onImportAccount={() => { setIsImportingAccount(!isImportingAccount); }}

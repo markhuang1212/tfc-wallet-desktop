@@ -44,11 +44,13 @@ function AccountListView(props: AccountListViewProps) {
 
       <div style={{ display: 'flex', alignItems: 'stretch', flexDirection: 'column', backgroundColor: 'white' }}>
         <Divider />
-        <div style={{ margin: '16px', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        <div style={{ display: 'flex', margin: '16px', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
           <Button onClick={props.onImportAccount} variant="contained" size="small">
             <Typography color="textPrimary">{t('createOrImportButtonText')}</Typography>
           </Button>
-          <IconButton><Settings /></IconButton>
+          <IconButton>
+            <Settings />
+          </IconButton>
         </div>
       </div>
     </div>

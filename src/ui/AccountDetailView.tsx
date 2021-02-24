@@ -18,7 +18,8 @@ interface AccountDetailViewProps {
 
 const useStyle = makeStyles({
   container: {
-    flex: 2
+    flex: 2,
+    overflow: 'hidden'
   },
   content: {
     display: 'flex',
@@ -188,7 +189,10 @@ function AccountDetailView(props: AccountDetailViewProps) {
           <Button color="inherit" onClick={() => location.reload()}>{t('refreshButtonText')}</Button>
         </Toolbar>
       </AppBar>
-      <div>
+      <div style={{
+        height: '100%',
+        overflow: 'scroll'
+      }}>
         <Container maxWidth="sm">
           {props.account ?
 
