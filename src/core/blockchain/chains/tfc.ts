@@ -116,7 +116,11 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
     return new PromiEvent(
         async (resolve, reject, emitter) => {
           try {
-            const resp = await axios.post(`${this.endpoint}/v4/estimateTx`, {
+            let resp = await axios.delete(
+                `${this.endpoint}/v4/estimateTx/${tfcAddress}`,
+            );
+            TfcChain.throwIfAPIError(resp);
+            resp = await axios.post(`${this.endpoint}/v4/estimateTx`, {
               tfcAddr: tfcAddress,
               ercAddr: ethAccount.address,
               amount: amount.toString(10),
