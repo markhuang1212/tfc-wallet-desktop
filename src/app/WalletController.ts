@@ -9,9 +9,6 @@ import { CoinCode } from "../core/defines";
 
 interface WalletInfo {
     passphrase?: string
-    // accountIndexes: {
-    //     [key in 'ETH' | 'BTC' | 'TFC']: number
-    // }
     accountAliases: {
         [key: string]: string
     }
@@ -83,6 +80,17 @@ class WalletController {
         })
     }
 
+    renameAccount(privKey: string, newName: string) {
+        this.info.accountAliases[privKey] = newName
+        this.infoPsc.object = this.info
+        this.infoPsc.save()
+        const account = this.data_temp.find(account => account.privKey === privKey)
+        if (account) {
+            account.accountName = newName
+        }
+        return this.data_temp
+    }
+
     getAccounts() {
         const data: AccountData[] = []
 
@@ -90,7 +98,7 @@ class WalletController {
             data.push({
                 accountType: 'bip44-master',
                 accountId: uuidv4(),
-                accountName: 'Main Account',
+                accountName: this.info.accountAliases[this.wallet.privateKey.toString('hex')] ?? 'Main Account',
                 subAccounts: [
                     {
                         accountId: uuidv4(),
@@ -134,7 +142,7 @@ class WalletController {
         this.wallet.getCoinWallet(CoinCode.BTC).standaloneAccounts.forEach(account => {
             data.push({
                 accountId: uuidv4(),
-                accountName: 'Account',
+                accountName: this.info.accountAliases[account.privateKey.toString('hex')] ?? 'Account',
                 accountType: 'plain',
                 privKey: account.privateKey.toString('hex'),
                 pubKey: account.publicKey,
@@ -146,7 +154,7 @@ class WalletController {
         this.wallet.getCoinWallet(CoinCode.ETH).standaloneAccounts.forEach(account => {
             data.push({
                 accountId: uuidv4(),
-                accountName: 'Account',
+                accountName: this.info.accountAliases[account.privateKey.toString('hex')] ?? 'Account',
                 accountType: 'plain',
                 privKey: account.privateKey.toString('hex'),
                 address: account.address,
@@ -158,7 +166,7 @@ class WalletController {
         this.wallet.getCoinWallet(CoinCode.TFC_CHAIN).standaloneAccounts.forEach(account => {
             data.push({
                 accountId: uuidv4(),
-                accountName: 'Account',
+                accountName: this.info.accountAliases[account.privateKey.toString('hex')] ?? 'Account',
                 accountType: 'plain',
                 address: account.address,
                 privKey: account.privateKey.toString('hex'),

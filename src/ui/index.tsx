@@ -37,8 +37,8 @@ function App() {
 
   const onRename = async (newName: string) => {
     const privKey = (accountDetailData as (AccountDataBip44Master | AccountDataPlain)).privKey
-    await ipcRenderer.invoke('rename-account', privKey, newName)
-    setAccountData(await ipcRenderer.invoke('get-accounts'))
+    const newAccountData = await ipcRenderer.invoke('rename-account', privKey, newName)
+    setAccountData(newAccountData)
   }
 
   const onChooseErcCoin = (newCoin: 'ETH' | 'TFC' | 'USDT') => {

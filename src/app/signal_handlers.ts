@@ -25,7 +25,8 @@ ipcMain.handle('get-transactions', async (_, pubKey: string, coinType: 'ETH' | '
 })
 
 ipcMain.handle('rename-account', (_, privKey: string, newName: string) => {
-    
+    console.log(`Receive signal: rename-account, privKey: ${privKey}, newName: ${newName}`)
+    return WalletController.shared.renameAccount(privKey, newName)
 })
 
 ipcMain.handle('get-balance', async (_, privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
