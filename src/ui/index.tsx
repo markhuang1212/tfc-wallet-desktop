@@ -8,6 +8,7 @@ import { ipcRenderer } from 'electron';
 import '@fontsource/roboto'
 import TransferView from './TransferView';
 import SwapView from './SwapView';
+import './i18n'
 
 function App() {
   const [isImportingAccount, setIsImportingAccount] = useState(false)

@@ -5,7 +5,7 @@ import { ImportExport, Check, Done } from '@material-ui/icons'
 import { useEffect, useState } from "react";
 import { ipcRenderer, Menu } from "electron";
 import useBalance from "./useBalance";
-import { v4 as uuidv4 } from 'uuid'
+import { useTranslation } from 'react-i18next'
 
 interface AccountDetailViewProps {
   account?: AccountData | AccountDataBip44SubAccount
@@ -142,6 +142,7 @@ function AccountDetailView(props: AccountDetailViewProps) {
   const [ercCoin, setErcCoin] = useState<'ETH' | 'TFC' | 'USDT'>('ETH')
   const [balance, setBalance] = useState<bigint | undefined>(undefined)
   const [accountIndex, setAccountIndex] = useState(0)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (props.account && props.account.accountType === 'plain') {
@@ -167,11 +168,11 @@ function AccountDetailView(props: AccountDetailViewProps) {
     <div className={classes.container}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant='h6'>TFC Wallet</Typography>
+          <Typography variant='h6'>{t('productName')}</Typography>
           <span style={{ flex: 1 }}></span>
           {((props.account as AccountDataPlain | AccountDataBip44SubAccount | undefined)?.coinType === 'TFC') && <Button color="inherit" onClick={props.onStartSwap}>Swap</Button>}
           {(props.account && props.account.accountType !== 'bip44-master' && props.account.coinType !== 'TFC') && (<Button color="inherit" onClick={props.onStartTransfer}>Transfer</Button>)}
-          <Button color="inherit" onClick={() => location.reload()}>Refresh</Button>
+          <Button color="inherit" onClick={() => location.reload()}>{t('refreshButtonText')}</Button>
         </Toolbar>
       </AppBar>
       <Container maxWidth="sm">
@@ -201,10 +202,10 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
           <div>
             <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>
-              Select An Account
+              {t('selectAccountTip')}
             </Typography>
             <Typography variant="body1" color="textSecondary" align="center" style={{ marginTop: '16px' }}>
-              You can create or import account in the wallet.
+              {t('createOrImportAccountTip')}
             </Typography>
           </div>
 
