@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactDom from 'react-dom';
-import { AccountData, AccountDataBip44Master, AccountDataBip44SubAccount, TxRequestInfo } from './../Types';
+import { AccountData, AccountDataBip44Master, AccountDataBip44SubAccount, AccountDataPlain, TxRequestInfo } from './../Types';
 import AccountDetailView from './AccountDetailView';
 import AccountListView from './AccountListView';
 import ImportAccountView from './ImportAccountVIew';
@@ -33,6 +33,12 @@ function App() {
     } else {
       setAccountDetailData({ ...(accountData[index] as AccountDataBip44Master).subAccounts[subIndex] })
     }
+  }
+
+  const onRename = async (newName: string) => {
+    const privKey = (accountDetailData as (AccountDataBip44Master | AccountDataPlain)).privKey
+    await ipcRenderer.invoke('rename-account', privKey, newName)
+    setAccountData(await ipcRenderer.invoke('get-accounts'))
   }
 
   const onChooseErcCoin = (newCoin: 'ETH' | 'TFC' | 'USDT') => {
@@ -147,11 +153,13 @@ function App() {
       accounts={accountData}
       onSelectAccount={onSelectAccount} />
 
-    <AccountDetailView account={accountDetailData}
+    <AccountDetailView
+      account={accountDetailData}
       onStartTransfer={() => setIsTransferring(true)}
       onChooseIndex={onChooseAccountIndex}
       onChooseErcCoin={onChooseErcCoin}
-      onStartSwap={() => setIsSwapping(true)} />
+      onStartSwap={() => setIsSwapping(true)}
+      onRename={onRename} />
 
     <ImportAccountView visible={isImportingAccount}
       onCancel={() => setIsImportingAccount(false)}

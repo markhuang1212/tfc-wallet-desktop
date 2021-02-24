@@ -24,6 +24,10 @@ ipcMain.handle('get-transactions', async (_, pubKey: string, coinType: 'ETH' | '
     return txs
 })
 
+ipcMain.handle('rename-account', (_, privKey: string, newName: string) => {
+    
+})
+
 ipcMain.handle('get-balance', async (_, privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
     console.log(`Receive signal: get-balance, privKey: ${privKey}, coinType: ${coinType}, ercCoin: ${ercCoin}`)
     const balance = await AccountFunctionsProvider.shared.getBalance(privKey, coinType, ercCoin)

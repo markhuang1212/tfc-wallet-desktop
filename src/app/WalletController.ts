@@ -69,6 +69,20 @@ class WalletController {
         this.walletPsc.save()
     }
 
+    removeBip44Account() {
+        this.wallet.seed = Buffer.from('12345678', 'hex')
+    }
+
+    removeStandaloneAccount(addr: string) {
+        [this.wallet.coinWallets['0'],
+        this.wallet.coinWallets['360'],
+        this.wallet.coinWallets['599'],
+        this.wallet.coinWallets['60'],
+        this.wallet.coinWallets['995']].forEach(cw => {
+            // cw.standaloneAccounts = cw.standaloneAccounts.filter(account => account.address !== addr)
+        })
+    }
+
     getAccounts() {
         const data: AccountData[] = []
 

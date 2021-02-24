@@ -1,10 +1,11 @@
 import { AccountData, AccountDataBip44SubAccount, AccountDataPlain } from "./../Types";
-import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem, FormControlLabel } from '@material-ui/core'
+import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem, FormControlLabel, InputAdornment, Input, OutlinedInput } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import { ImportExport, Check } from '@material-ui/icons'
+import { ImportExport, Check, Done } from '@material-ui/icons'
 import { useEffect, useState } from "react";
 import { ipcRenderer, Menu } from "electron";
 import useBalance from "./useBalance";
+import { v4 as uuidv4 } from 'uuid'
 
 interface AccountDetailViewProps {
   account?: AccountData | AccountDataBip44SubAccount
@@ -12,6 +13,7 @@ interface AccountDetailViewProps {
   onChooseIndex: (newIndex: number) => any
   onChooseErcCoin: (newErcCoin: 'ETH' | 'TFC' | 'USDT') => any
   onStartSwap: () => any
+  onRename: (newName: string) => any
 }
 
 const useStyle = makeStyles({
@@ -25,8 +27,32 @@ const useStyle = makeStyles({
   }
 })
 
-function AccountDetailRename(props: { onRename: (newName: string) => any }) {
+function AccountDetailRename(props: { name: string, onRename: (newName: string) => any }) {
 
+  const [name, setName] = useState(props.name)
+
+  const onChangeName = (e: any) => {
+    setName(e.target.value)
+  }
+
+  useEffect(() => {
+    setName(props.name)
+  }, [props.name])
+
+  return (
+    <FormControl variant="outlined">
+      <InputLabel>Account Name</InputLabel>
+      <OutlinedInput
+        label="Account Name"
+        value={name}
+        onChange={onChangeName}
+        endAdornment={
+          <InputAdornment position="end" style={{ visibility: name !== props.name ? 'visible' : 'hidden' }}>
+            <IconButton onClick={() => props.onRename(name)}><Done color="action"></Done></IconButton>
+          </InputAdornment>
+        } />
+    </FormControl>
+  )
 }
 
 function AccountDetailBalance(props: { balance: string }) {
@@ -146,6 +172,8 @@ function AccountDetailView(props: AccountDetailViewProps) {
         {props.account ?
 
           <div className={classes.content}>
+            {(props.account.accountType === 'bip44-master' || props.account.accountType === 'plain') &&
+              <AccountDetailRename name={props.account.accountName} onRename={props.onRename} />}
             {(props.account as AccountDataPlain | AccountDataBip44SubAccount).coinType === 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
             {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
             {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
