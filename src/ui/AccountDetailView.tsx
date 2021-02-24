@@ -30,6 +30,7 @@ const useStyle = makeStyles({
 function AccountDetailRename(props: { name: string, onRename: (newName: string) => any }) {
 
   const [name, setName] = useState(props.name)
+  const { t } = useTranslation()
 
   const onChangeName = (e: any) => {
     setName(e.target.value)
@@ -41,9 +42,9 @@ function AccountDetailRename(props: { name: string, onRename: (newName: string) 
 
   return (
     <FormControl variant="outlined" style={{ margin: '16px 0px' }}>
-      <InputLabel>Account Name</InputLabel>
+      <InputLabel>{t('accountDetail.editAccountNameText')}</InputLabel>
       <OutlinedInput
-        label="Account Name"
+        label={t('accountDetail.editAccountNameText')}
         value={name}
         onChange={onChangeName}
         endAdornment={
@@ -56,9 +57,11 @@ function AccountDetailRename(props: { name: string, onRename: (newName: string) 
 }
 
 function AccountDetailBalance(props: { balance: string }) {
+  const { t } = useTranslation()
+
   return (
     <div style={{ margin: '16px 0px' }}>
-      <Typography variant="subtitle1">Balance</Typography>
+      <Typography variant="subtitle1">{t('accountDetail.balance')}</Typography>
       <Typography variant="h2">{props.balance}</Typography>
     </div>
   )
@@ -83,18 +86,24 @@ function AccountDetailChooseIndex(props: { index: number, onChoose: (newIndex: n
     props.onChoose(e.target.value)
   }
 
-  return (
-    <FormControl variant="outlined" style={{ margin: '16px 0px' }}>
-      <InputLabel>Account Index</InputLabel>
-      <Select value={index} onChange={onChangeIndex} label="Account Index">
-        {
-          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(v => (
-            <MenuItem value={v} key={v}>{v}</MenuItem>
-          ))
-        }
-      </Select>
+  const { t } = useTranslation()
 
-    </FormControl>
+  return (
+    <div style={{ margin: '16px 0px' }} >
+      <FormControl variant="outlined" fullWidth>
+        <InputLabel>{t('accountDetail.chooseAccountIndexText')}</InputLabel>
+        <Select value={index} onChange={onChangeIndex} label={t('accountDetail.chooseAccountIndexText')}>
+          {
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(v => (
+              <MenuItem value={v} key={v}>{v}</MenuItem>
+            ))
+          }
+        </Select>
+      </FormControl>
+      <Typography variant="body2" color="textSecondary">
+        {t('accountDetail.chooseAccountIndexDescription')}
+      </Typography>
+    </div>
   )
 }
 
@@ -102,6 +111,7 @@ type Erc20Coin = 'ETH' | 'USDT' | 'TFC'
 function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: Erc20Coin) => any }) {
 
   const [coin, setCoin] = useState(props.coin)
+  const { t } = useTranslation()
 
   const onChoose = (e: any) => {
     if (coin !== e.target.value) {
@@ -115,14 +125,17 @@ function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: E
   }, [props.coin])
 
   return (
-    <FormControl variant="outlined" style={{ margin: '16px 0px' }}>
-      <InputLabel>ETH/ERC20 Coin</InputLabel>
-      <Select label="ETH/ERC20 Coin" value={coin} onChange={onChoose}>
-        <MenuItem value="ETH">ETH</MenuItem>
-        <MenuItem value="USDT">USDT</MenuItem>
-        <MenuItem value="TFC">TFC</MenuItem>
-      </Select>
-    </FormControl>
+    <div style={{ margin: '16px 0px' }}>
+      <FormControl variant="outlined" fullWidth>
+        <InputLabel>ETH/ERC20 Coin</InputLabel>
+        <Select label="ETH/ERC20 Coin" value={coin} onChange={onChoose}>
+          <MenuItem value="ETH">ETH</MenuItem>
+          <MenuItem value="USDT">USDT</MenuItem>
+          <MenuItem value="TFC">TFC</MenuItem>
+        </Select>
+      </FormControl>
+      <Typography variant="body2" color="textSecondary">{t('accountDetail.chooseErcCoinDescription')}</Typography>
+    </div>
   )
 }
 
@@ -170,47 +183,49 @@ function AccountDetailView(props: AccountDetailViewProps) {
         <Toolbar>
           <Typography variant='h6'>{t('productName')}</Typography>
           <span style={{ flex: 1 }}></span>
-          {((props.account as AccountDataPlain | AccountDataBip44SubAccount | undefined)?.coinType === 'TFC') && <Button color="inherit" onClick={props.onStartSwap}>Swap</Button>}
-          {(props.account && props.account.accountType !== 'bip44-master' && props.account.coinType !== 'TFC') && (<Button color="inherit" onClick={props.onStartTransfer}>Transfer</Button>)}
+          {((props.account as AccountDataPlain | AccountDataBip44SubAccount | undefined)?.coinType === 'TFC') && <Button color="inherit" onClick={props.onStartSwap}>{t('swapButtonText')}</Button>}
+          {(props.account && props.account.accountType !== 'bip44-master' && props.account.coinType !== 'TFC') && (<Button color="inherit" onClick={props.onStartTransfer}>{t('transferButtonText')}</Button>)}
           <Button color="inherit" onClick={() => location.reload()}>{t('refreshButtonText')}</Button>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="sm">
-        {props.account ?
+      <div>
+        <Container maxWidth="sm">
+          {props.account ?
 
-          <div className={classes.content}>
+            <div className={classes.content}>
 
-            {(props.account.accountType === 'bip44-master' || props.account.accountType === 'plain') &&
-              <AccountDetailRename name={props.account.accountName} onRename={props.onRename} />}
+              {(props.account.accountType === 'bip44-master' || props.account.accountType === 'plain') &&
+                <AccountDetailRename name={props.account.accountName} onRename={props.onRename} />}
 
-            {(props.account as AccountDataPlain | AccountDataBip44SubAccount).coinType === 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
+              {(props.account as AccountDataPlain | AccountDataBip44SubAccount).coinType === 'ETH' && <AccountDetailChooseCoin coin="ETH" onChoose={onChooseErcCoin} />}
 
-            {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
+              {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
 
-            {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
+              {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
 
-            <AccountDetailKeys
-              pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : (props.account as AccountDataPlain).pubKey}
-              privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey}
-              address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : (props.account as AccountDataPlain).address} />
+              <AccountDetailKeys
+                pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : (props.account as AccountDataPlain).pubKey}
+                privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey}
+                address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : (props.account as AccountDataPlain).address} />
 
-            <AccountDetailFurtherAction onRemove={() => { }} />
+              <AccountDetailFurtherAction onRemove={() => { }} />
 
-          </div>
+            </div>
 
-          :
+            :
 
-          <div>
-            <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>
-              {t('selectAccountTip')}
-            </Typography>
-            <Typography variant="body1" color="textSecondary" align="center" style={{ marginTop: '16px' }}>
-              {t('createOrImportAccountTip')}
-            </Typography>
-          </div>
+            <div>
+              <Typography variant="h5" color="textSecondary" align="center" style={{ marginTop: '196px' }}>
+                {t('selectAccountTip')}
+              </Typography>
+              <Typography variant="body1" color="textSecondary" align="center" style={{ marginTop: '16px' }}>
+                {t('createOrImportAccountTip')}
+              </Typography>
+            </div>
 
-        }
-      </Container>
+          }
+        </Container>
+      </div>
     </div>
   );
 }

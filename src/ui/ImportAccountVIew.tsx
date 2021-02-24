@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Typography } from '@material-ui/core'
+import { useTranslation } from 'react-i18next';
 
 interface ImportAccountViewProps {
   visible: boolean
@@ -19,6 +20,7 @@ function ImportAccountActionView(props: {
   const [accountType, setAccountType] = useState<'bip44' | 'plain'>('bip44')
   const [text, setText] = useState('')
   const [coinType, setCoinType] = useState<ImportAccountCoinType | ''>('TFC')
+  const { t } = useTranslation()
 
   const onChangeFormat = (e: any) => {
     setFormat(e.target.value)
@@ -93,6 +95,8 @@ function ImportAccountView(props: ImportAccountViewProps) {
     text: ''
   })
 
+  const { t } = useTranslation()
+
   const onChangeSetting = (format: 'mnemonic' | 'seed', type: 'bip44' | 'plain', coinType: 'ETH' | 'BTC' | 'TFC' | undefined, text: string) => {
     console.log(text)
     setSetting({
@@ -105,12 +109,12 @@ function ImportAccountView(props: ImportAccountViewProps) {
       <DialogTitle>Import Account</DialogTitle>
       <ImportAccountActionView onChange={onChangeSetting} />
       <DialogActions>
-        <Button onClick={props.onCancel} color="primary">Back</Button>
+        <Button onClick={props.onCancel} color="primary">{t('cancelButtonText')}</Button>
         <Button onClick={() => props.onImportAccount(
           setting.format,
           setting.type,
           setting.coinType,
-          setting.text)} color="primary">Import</Button>
+          setting.text)} color="primary">{t('importAccount.importButtonText')}</Button>
       </DialogActions>
     </Dialog>
   )

@@ -18,7 +18,7 @@ interface AccountListViewProps {
 function AccountListView(props: AccountListViewProps) {
 
   const [focusedItemIndex, setFocusedItemIndex] = useState(-1)
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <div style={{
@@ -32,7 +32,7 @@ function AccountListView(props: AccountListViewProps) {
       </Toolbar>
       <Divider />
 
-      <List style={{ flex: 2 }}>
+      <List style={{ flex: 2, overflow: 'scroll' }}>
         {props.accounts.map((account, i) =>
           <AccountListItem
             key={account.accountId}
@@ -42,11 +42,14 @@ function AccountListView(props: AccountListViewProps) {
         )}
       </List>
 
-      <div style={{ padding: '24px', display: 'flex', justifyContent: "space-evenly", flexDirection: 'row' }}>
-        <Button onClick={props.onImportAccount} variant="contained" size="small">
-          <Typography color="textPrimary">{t('createOrImportButtonText')}</Typography>
-        </Button>
-        <IconButton><Settings /></IconButton>
+      <div style={{ display: 'flex', alignItems: 'stretch', flexDirection: 'column', backgroundColor: 'white' }}>
+        <Divider />
+        <div style={{ margin: '16px', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+          <Button onClick={props.onImportAccount} variant="contained" size="small">
+            <Typography color="textPrimary">{t('createOrImportButtonText')}</Typography>
+          </Button>
+          <IconButton><Settings /></IconButton>
+        </div>
       </div>
     </div>
   )
