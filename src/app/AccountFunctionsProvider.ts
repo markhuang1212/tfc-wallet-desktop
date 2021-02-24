@@ -9,8 +9,8 @@ class AccountFunctionsProvider {
 
     static shared = new AccountFunctionsProvider()
 
-    ethChain = new EthereumChain(Endpoints['60'].rinkeby)
-    tfcChain = new TfcChain(Endpoints[CoinCode.TFC_CHAIN][9523])
+    ethChain = new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint)
+    tfcChain = new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint)
 
     async getBalance(privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') {
         if (coinType === 'ETH' && ercCoin === 'ETH') {
