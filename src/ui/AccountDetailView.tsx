@@ -19,12 +19,12 @@ interface AccountDetailViewProps {
 const useStyle = makeStyles({
   container: {
     flex: 2,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   content: {
     display: 'flex',
     flexDirection: 'column',
-    paddingTop: '24px'
+    paddingTop: '24px',
   }
 })
 
@@ -180,7 +180,10 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
   return (
     <div className={classes.container}>
-      <AppBar position="static">
+      <AppBar position="fixed" style={{
+        left: '280px',
+        width: 'calc(100% - 280px)'
+      }}>
         <Toolbar>
           <Typography variant='h6'>{t('productName')}</Typography>
           <span style={{ flex: 1 }}></span>
@@ -191,8 +194,9 @@ function AccountDetailView(props: AccountDetailViewProps) {
       </AppBar>
       <div style={{
         height: '100%',
-        overflow: 'scroll'
+        overflow: 'scroll',
       }}>
+        <div style={{ height: '64px' }}></div>
         <Container maxWidth="sm">
           {props.account ?
 
