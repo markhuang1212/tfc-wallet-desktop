@@ -50,6 +50,7 @@ ipcMain.handle('create-bip44-account', async (event, privKey: string | string[])
 
 ipcMain.handle('remove-account', async (event, privKey: string) => {
     console.log(`Receive signal: Remove Account, privKey: ${privKey}`)
+    WalletController.shared.removeAccount(privKey)
 })
 
 ipcMain.handle('swap-tfc', async (_, from_privKey: string, to_privKey: string, amount: bigint) => {

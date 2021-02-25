@@ -102,9 +102,10 @@ class WalletController {
             this.wallet.coinWallets['599'],
             this.wallet.coinWallets['60'],
             this.wallet.coinWallets['995']].forEach(cw => {
-                // cw.standaloneAccounts = cw.standaloneAccounts.filter(account => account.address !== addr)
+                cw.removeStandaloneAccount(privKey)
             })
         }
+
     }
 
     renameAccount(privKey: string, newName: string) {
