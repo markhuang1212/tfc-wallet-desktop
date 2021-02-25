@@ -109,6 +109,7 @@ function App() {
 
     const newAccountData = await ipcRenderer.invoke('get-accounts')
     setAccountData(newAccountData)
+    setAccountDetailData(undefined)
   }
 
   const onChooseAccountIndex = (newIndex: number) => {

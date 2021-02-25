@@ -6,6 +6,7 @@ import v8 from 'v8'
 import { v4 as uuidv4 } from 'uuid'
 import { Wallet, WalletJSON } from "../core/wallet";
 import { CoinCode } from "../core/defines";
+import { generateMnemonic } from 'bip39'
 
 interface WalletInfo {
     passphrase?: string
@@ -52,6 +53,10 @@ class WalletController {
         } else if (typeof arg === 'object') {
             arg = (arg as string[]).join(' ')
 
+            if (arg.length === 0) {
+                arg = generateMnemonic()
+            }
+
             try {
                 const testW = Wallet.fromMnemonic(arg)
             } catch {
@@ -66,6 +71,8 @@ class WalletController {
         this.infoPsc.save()
         this.walletPsc.object = this.wallet.toJSON()
         this.walletPsc.save()
+
+        return arg
     }
 
     loadStandaloneAccount(coinType: 'ETH' | 'BTC' | 'TFC', privKey: string) {
@@ -155,7 +162,7 @@ class WalletController {
                     }
                 ],
                 privKey: this.wallet.privateKey.toString('hex'),
-                passPhrase: 'pass phrase'
+                passPhrase: this.info.passphrase
             })
         }
 

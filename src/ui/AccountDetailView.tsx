@@ -247,7 +247,8 @@ function AccountDetailView(props: AccountDetailViewProps) {
               <AccountDetailKeys
                 pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : (props.account as AccountDataPlain).pubKey}
                 privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey}
-                address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : (props.account as AccountDataPlain).address} />
+                address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : (props.account as AccountDataPlain).address}
+                mnemonic={props.account.accountType === 'bip44-master' ? props.account.passPhrase : undefined} />
 
               <AccountDetailFurtherAction onRemove={props.onRemoveAccount} account={props.account} />
 

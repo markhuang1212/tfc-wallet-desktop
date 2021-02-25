@@ -33,6 +33,7 @@ const resources: Resource = {
                 formatFieldText: 'Import Format',
                 formatSeed: 'Seed',
                 formatMnemonic: 'Mnemonic',
+                formatPrivKey: 'Private Key',
                 coinTypeFieldText: 'Coin Type',
                 createAccountTip: 'If you want to generate a new account, leave this field empty.'
             }
@@ -68,6 +69,7 @@ const resources: Resource = {
                 formatFieldText: '导入格式',
                 formatSeed: 'Seed',
                 formatMnemonic: '助记词',
+                formatPrivKey: '私钥',
                 coinTypeFieldText: '货币种类',
                 createAccountTip: '如果您想创建一个新账户，请在此处留空。'
             }

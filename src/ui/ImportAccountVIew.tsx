@@ -69,11 +69,21 @@ function ImportAccountActionView(props: {
         <FormLabel>{t('importAccount.formatFieldText')}</FormLabel>
         <RadioGroup value={format} onChange={onChangeFormat}>
           <FormControlLabel value="mnemonic" control={<Radio />} label={t('importAccount.formatMnemonic')} disabled={accountType !== 'bip44'} />
-          <FormControlLabel value="seed" control={<Radio />} label={t('importAccount.formatSeed')} />
+          <FormControlLabel value="seed" control={<Radio />} label={accountType==='bip44'?t('importAccount.formatSeed'):t('importAccount.formatPrivKey')} />
         </RadioGroup>
       </FormControl>
       <TextField
-        label={format === 'mnemonic' ? t('importAccount.formatMnemonic') : t('importAccount.formatSeed')}
+        label={(() => {
+          if (format === 'mnemonic') {
+            return t('importAccount.formatMnemonic')
+          }
+          if (format === 'seed' && accountType === 'bip44') {
+            return t('importAccount.formatSeed')
+          }
+          if (format === 'seed' && accountType === 'plain') {
+            return t('importAccount.formatPrivKey')
+          }
+        })()}
         value={text}
         onChange={onChangeTextInput}></TextField>
       <Typography variant="body2" style={{ marginBottom: '16px' }} color="textSecondary">

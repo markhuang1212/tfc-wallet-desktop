@@ -47,8 +47,20 @@ class AccountFunctionsProvider {
                 event.on('pending', (txHash: string) => {
                     res(txHash)
                 })
-                event.on('error', () => {
-                    rej()
+                event.on('error', e => {
+                    rej(e)
+                })
+            })
+        }
+        if (txInfo.coinType === 'TFC') {
+            return new Promise<string>((res, rej) => {
+                const account = new TfcChainAccount(Buffer.from(txInfo.sender_privKey, 'hex'))
+                const event = this.tfcChain.transfer(txInfo.receiver_address, txInfo.amount, account)
+                event.on('pending', txHash => {
+                    res(txHash)
+                })
+                event.on('error', e => {
+                    rej(e)
                 })
             })
         }
