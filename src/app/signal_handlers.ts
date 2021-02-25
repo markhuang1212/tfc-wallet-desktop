@@ -47,8 +47,8 @@ ipcMain.handle('create-bip44-account', async (event, privKey: string | string[])
     }
 })
 
-ipcMain.handle('remove-plain-account', async (event, account_addr: string) => {
-
+ipcMain.handle('remove-account', async (event, privKey: string) => {
+    console.log(`Receive signal: Remove Account, privKey: ${privKey}`)
 })
 
 ipcMain.handle('swap-tfc', async (_, from_privKey: string, to_privKey: string, amount: bigint) => {

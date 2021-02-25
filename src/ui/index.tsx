@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactDom from 'react-dom';
-import { AccountData, AccountDataBip44Master, AccountDataBip44SubAccount, AccountDataPlain, TxRequestInfo } from './../Types';
+import { AccountData, AccountDataBip44Master, AccountDataBip44SubAccount, AccountDataPlain, TfcChainEndpoint, TxRequestInfo } from './../Types';
 import AccountDetailView from './AccountDetailView';
 import AccountListView from './AccountListView';
 import ImportAccountView from './ImportAccountVIew';
@@ -20,6 +20,7 @@ function App() {
   const [accountDetailData, setAccountDetailData] = useState<AccountData | AccountDataBip44SubAccount | undefined>(undefined)
   const [accountIndex, setAccountIndex] = useState(0)
   const [ercCoin, setErcCoin] = useState<'ETH' | 'TFC' | 'USDT'>('ETH')
+  const [tfcChainEndpoint, setTfcChainEndpoint] = useState<TfcChainEndpoint>('openbi')
 
 
   useEffect(() => {
@@ -77,24 +78,32 @@ function App() {
     if (type === 'bip44') {
       if (format === 'mnemonic') {
         const mnemonic = text.split(' ')
-        await ipcRenderer.invoke('create-bip44-account', mnemonic)
+        try {
+          await ipcRenderer.invoke('create-bip44-account', mnemonic)
+        } catch {
+          alert('Error!')
+        }
       }
       if (format === 'seed') {
-        await ipcRenderer.invoke('create-bip44-account', text)
+        try {
+          await ipcRenderer.invoke('create-bip44-account', text)
+        } catch {
+          alert('Error!')
+        }
       }
     }
 
     if (type === 'plain') {
-      if (format === 'mnemonic') {
-        console.log('NOT supported')
-        return
-      }
       if (format === 'seed') {
         if (coinType === undefined) {
-          console.log('invalid coin type')
+          alert('invalid coin type')
           return
         }
-        await ipcRenderer.invoke('create-plain-account', coinType, text)
+        try {
+          await ipcRenderer.invoke('create-plain-account', coinType, text)
+        } catch {
+          alert('Error!')
+        }
       }
     }
 
@@ -104,6 +113,10 @@ function App() {
 
   const onChooseAccountIndex = (newIndex: number) => {
     setAccountIndex(newIndex)
+  }
+
+  const onChooseTfcChainEndpoint = (newEndpoint: TfcChainEndpoint) => {
+    setTfcChainEndpoint(newEndpoint)
   }
 
   const onTransfer = (recipient: string, amount: string) => {
@@ -140,6 +153,11 @@ function App() {
 
   }
 
+  const onRemoveAccount = async () => {
+    const privKey = (accountDetailData as AccountData).privKey
+    await ipcRenderer.invoke('remove-account', privKey)
+  }
+
   return (<div style={{
     display: 'flex',
     flexDirection: 'row',
@@ -149,7 +167,6 @@ function App() {
     right: '0px',
     bottom: '0px',
     left: '0pt',
-    // overflow: 'hidden'
   }}>
     <AccountListView
       onImportAccount={() => { setIsImportingAccount(!isImportingAccount); }}
@@ -162,7 +179,9 @@ function App() {
       onChooseIndex={onChooseAccountIndex}
       onChooseErcCoin={onChooseErcCoin}
       onStartSwap={() => setIsSwapping(true)}
-      onRename={onRename} />
+      onChooseEndpoint={onChooseTfcChainEndpoint}
+      onRename={onRename}
+      onRemoveAccount={onRemoveAccount} />
 
     <ImportAccountView visible={isImportingAccount}
       onCancel={() => setIsImportingAccount(false)}

@@ -48,17 +48,17 @@ function ImportAccountActionView(props: {
   return (
     <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
       <FormControl>
-        <FormLabel>Account Type</FormLabel>
+        <FormLabel>{t('importAccount.accountTypeFieldText')}</FormLabel>
         <RadioGroup value={accountType} onChange={onChangeAccountType}>
-          <FormControlLabel value="bip44" control={<Radio />} label="BIP44 Account" />
-          <FormControlLabel value="plain" control={<Radio />} label="Standalone Account" />
+          <FormControlLabel value="bip44" control={<Radio />} label={t('importAccount.bip44Account')} />
+          <FormControlLabel value="plain" control={<Radio />} label={t('importAccount.standaloneAccount')} />
         </RadioGroup>
       </FormControl>
       <Typography variant="body2" style={{ marginBottom: '16px' }} color="textSecondary">
-        BIP44 Account enables you to have multiple crypto-currency coins and addresses in one single account.
+        {t('importAccount.accountTypeDescriptionText')}
       </Typography>
       <FormControl style={{ display: accountType === 'plain' ? 'block' : 'none' }}>
-        <FormLabel>Coin Type</FormLabel>
+        <FormLabel>{t('importAccount.coinTypeFieldText')}</FormLabel>
         <RadioGroup value={coinType} onChange={onChangeCoinType}>
           <FormControlLabel value="ETH" control={<Radio />} label="ETH" />
           <FormControlLabel value="BTC" control={<Radio />} label="BTC" />
@@ -66,15 +66,18 @@ function ImportAccountActionView(props: {
         </RadioGroup>
       </FormControl>
       <FormControl>
-        <FormLabel>Import Format</FormLabel>
+        <FormLabel>{t('importAccount.formatFieldText')}</FormLabel>
         <RadioGroup value={format} onChange={onChangeFormat}>
-          <FormControlLabel value="mnemonic" control={<Radio />} label="Mnemonic" disabled={accountType !== 'bip44'} />
-          <FormControlLabel value="seed" control={<Radio />} label="Seed/Private Key" />
+          <FormControlLabel value="mnemonic" control={<Radio />} label={t('importAccount.formatMnemonic')} disabled={accountType !== 'bip44'} />
+          <FormControlLabel value="seed" control={<Radio />} label={t('importAccount.formatSeed')} />
         </RadioGroup>
       </FormControl>
-      <TextField label={format} value={text} onChange={onChangeTextInput}></TextField>
+      <TextField
+        label={format === 'mnemonic' ? t('importAccount.formatMnemonic') : t('importAccount.formatSeed')}
+        value={text}
+        onChange={onChangeTextInput}></TextField>
       <Typography variant="body2" style={{ marginBottom: '16px' }} color="textSecondary">
-        If you want to generate a new account, leave this field empty.
+        {t('importAccount.createAccountTip')}
       </Typography>
     </DialogContent>
   )
@@ -106,7 +109,7 @@ function ImportAccountView(props: ImportAccountViewProps) {
 
   return (
     <Dialog open={props.visible} maxWidth="sm" fullWidth>
-      <DialogTitle>Import Account</DialogTitle>
+      <DialogTitle>{t('importAccount.importAccountTitle')}</DialogTitle>
       <ImportAccountActionView onChange={onChangeSetting} />
       <DialogActions>
         <Button onClick={props.onCancel} color="primary">{t('cancelButtonText')}</Button>

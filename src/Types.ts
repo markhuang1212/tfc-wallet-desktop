@@ -2,7 +2,7 @@
  * Created by hm. Used in /app and /ui
  */
 
-interface TxRequestInfo {
+export interface TxRequestInfo {
     sender_privKey: string,
     receiver_address: string,
     coinType: 'ETH' | 'BTC' | 'TFC',
@@ -10,16 +10,17 @@ interface TxRequestInfo {
     amount: bigint
 }
 
-// interface Coin {
-//     fullName: string
-//     abbrName: string
-//     identifier: number
-// }
+export interface SwapRequestInfo {
+    from_privKey: string,
+    to_privKey: string,
+    from_endpoint: string
+}
 
-type Coin = 'ETH' | 'BTC' | 'TFC'
-type Erc20Coin = 'ETH' | 'USDT' | 'TFC'
+export type Coin = 'ETH' | 'BTC' | 'TFC'
+export type Erc20Coin = 'ETH' | 'USDT' | 'TFC'
+export type TfcChainEndpoint = 'openbi' | 'blockchainfs'
 
-interface AccountDataPlain {
+export interface AccountDataPlain {
     accountId: string
     accountName: string
 
@@ -31,7 +32,7 @@ interface AccountDataPlain {
     address: string
 }
 
-interface AccountDataBip44SubAccount {
+export interface AccountDataBip44SubAccount {
     accountType: 'bip44-sub-account'
     accountId: string
     accountName: string
@@ -43,7 +44,7 @@ interface AccountDataBip44SubAccount {
     }[]
 }
 
-interface AccountDataBip44Master {
+export interface AccountDataBip44Master {
     accountId: string
     accountName: string
     accountType: 'bip44-master'
@@ -52,6 +53,4 @@ interface AccountDataBip44Master {
     passPhrase?: string
 }
 
-type AccountData = AccountDataBip44Master | AccountDataPlain
-
-export { AccountData, TxRequestInfo, Coin, Erc20Coin, AccountDataBip44Master, AccountDataBip44SubAccount, AccountDataPlain }
+export type AccountData = AccountDataBip44Master | AccountDataPlain

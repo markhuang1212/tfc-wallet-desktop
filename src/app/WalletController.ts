@@ -40,14 +40,28 @@ class WalletController {
     loadWallet(seed: string): void;
     loadWallet(arg: any) {
         if (typeof arg === 'string') {
+
+            try {
+                const testW = Wallet.fromSeed(arg)
+            } catch {
+                throw Error('Invalid Seed')
+            }
+
             this.wallet.seed = Buffer.from(arg, 'hex')
+
         } else if (typeof arg === 'object') {
             arg = (arg as string[]).join(' ')
+
+            try {
+                const testW = Wallet.fromMnemonic(arg)
+            } catch {
+                throw Error('Invalid Mnemonic')
+            }
+
             this.wallet.mnemonic = arg
             this.info.passphrase = arg
-        } else {
-            throw Error('Invalid argument')
         }
+
         this.infoPsc.object = this.info
         this.infoPsc.save()
         this.walletPsc.object = this.wallet.toJSON()
@@ -55,6 +69,11 @@ class WalletController {
     }
 
     loadStandaloneAccount(coinType: 'ETH' | 'BTC' | 'TFC', privKey: string) {
+
+        if (Buffer.from(privKey, 'hex').length !== 32) {
+            throw Error('Invalid private key')
+        }
+
         if (coinType === 'BTC') {
             this.wallet.getCoinWallet(CoinCode.BTC).addStandaloneAccounts(privKey)
         } else if (coinType === 'ETH') {
@@ -66,18 +85,19 @@ class WalletController {
         this.walletPsc.save()
     }
 
-    removeBip44Account() {
-        this.wallet.seed = Buffer.from('12345678', 'hex')
-    }
+    removeAccount(privKey: string) {
 
-    removeStandaloneAccount(addr: string) {
-        [this.wallet.coinWallets['0'],
-        this.wallet.coinWallets['360'],
-        this.wallet.coinWallets['599'],
-        this.wallet.coinWallets['60'],
-        this.wallet.coinWallets['995']].forEach(cw => {
-            // cw.standaloneAccounts = cw.standaloneAccounts.filter(account => account.address !== addr)
-        })
+        if (this.wallet.privateKey.toString('hex') === privKey) {
+            this.wallet.seed = Buffer.from('12345678', 'hex')
+        } else {
+            [this.wallet.coinWallets['0'],
+            this.wallet.coinWallets['360'],
+            this.wallet.coinWallets['599'],
+            this.wallet.coinWallets['60'],
+            this.wallet.coinWallets['995']].forEach(cw => {
+                // cw.standaloneAccounts = cw.standaloneAccounts.filter(account => account.address !== addr)
+            })
+        }
     }
 
     renameAccount(privKey: string, newName: string) {

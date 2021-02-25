@@ -1,4 +1,4 @@
-import { AccountData, AccountDataBip44SubAccount, AccountDataPlain } from "./../Types";
+import { AccountData, AccountDataBip44SubAccount, AccountDataPlain, Erc20Coin, TfcChainEndpoint } from "./../Types";
 import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem, FormControlLabel, InputAdornment, Input, OutlinedInput } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport, Check, Done } from '@material-ui/icons'
@@ -6,14 +6,17 @@ import { useEffect, useState } from "react";
 import { ipcRenderer, Menu } from "electron";
 import useBalance from "./useBalance";
 import { useTranslation } from 'react-i18next'
+import DescriptionText from "./DescriptionText";
 
 interface AccountDetailViewProps {
   account?: AccountData | AccountDataBip44SubAccount
   onStartTransfer: () => any
   onChooseIndex: (newIndex: number) => any
-  onChooseErcCoin: (newErcCoin: 'ETH' | 'TFC' | 'USDT') => any
+  onChooseErcCoin: (newErcCoin: Erc20Coin) => any
+  onChooseEndpoint: (newEndpoint: TfcChainEndpoint) => any
   onStartSwap: () => any
   onRename: (newName: string) => any
+  onRemoveAccount: () => any
 }
 
 const useStyle = makeStyles({
@@ -68,6 +71,33 @@ function AccountDetailBalance(props: { balance: string }) {
   )
 }
 
+function AccountDetailChooseEndpoint(props: { endpoint: TfcChainEndpoint, onChoose: (newEndpoint: TfcChainEndpoint) => any }) {
+  const { t } = useTranslation()
+  const [endpoint, setEndpoint] = useState(props.endpoint)
+
+  useEffect(() => {
+    setEndpoint(props.endpoint)
+  }, [props.endpoint])
+
+  const onChoose = (e: any) => {
+    setEndpoint(e.target.value)
+    props.onChoose(e.target.value)
+  }
+
+  return (
+    <div style={{ margin: '16px 0px' }}>
+      <FormControl variant="outlined" fullWidth>
+        <InputLabel>{t('accountDetail.chooseEndpointText')}</InputLabel>
+        <Select label={t('accountDetail.chooseEndpointText')} value={endpoint} onChange={onChoose}>
+          <MenuItem value="openbi">OpenBI</MenuItem>
+          <MenuItem value="blockchainfs">BlockchainFs</MenuItem>
+        </Select>
+      </FormControl>
+      <DescriptionText>{t('accountDetail.chooseEndpointDescription')}</DescriptionText>
+    </div>
+  )
+}
+
 function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string, address?: string }) {
   return (
     <div style={{ margin: '16px 0px' }}>
@@ -101,14 +131,11 @@ function AccountDetailChooseIndex(props: { index: number, onChoose: (newIndex: n
           }
         </Select>
       </FormControl>
-      <Typography variant="body2" color="textSecondary">
-        {t('accountDetail.chooseAccountIndexDescription')}
-      </Typography>
+      <DescriptionText>{t('accountDetail.chooseAccountIndexDescription')}</DescriptionText>
     </div>
   )
 }
 
-type Erc20Coin = 'ETH' | 'USDT' | 'TFC'
 function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: Erc20Coin) => any }) {
 
   const [coin, setCoin] = useState(props.coin)
@@ -135,17 +162,17 @@ function AccountDetailChooseCoin(props: { coin: Erc20Coin, onChoose: (newCoin: E
           <MenuItem value="TFC">TFC</MenuItem>
         </Select>
       </FormControl>
-      <Typography variant="body2" color="textSecondary">{t('accountDetail.chooseErcCoinDescription')}</Typography>
+      <DescriptionText>{t('accountDetail.chooseErcCoinDescription')}</DescriptionText>
     </div>
   )
 }
 
-function AccountDetailFurtherAction(props: { onRemove: () => any }) {
+function AccountDetailFurtherAction(props: { onRemove: () => any, account: AccountData | AccountDataBip44SubAccount }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '16px' }}>
-      <Button onClick={props.onRemove}>
+      {props.account.accountType !== 'bip44-sub-account' && <Button onClick={props.onRemove}>
         <Typography color="error">Remove Account</Typography>
-      </Button>
+      </Button>}
     </div>
   )
 }
@@ -153,18 +180,18 @@ function AccountDetailFurtherAction(props: { onRemove: () => any }) {
 function AccountDetailView(props: AccountDetailViewProps) {
 
   const classes = useStyle()
-  const [ercCoin, setErcCoin] = useState<'ETH' | 'TFC' | 'USDT'>('ETH')
+  const [ercCoin, setErcCoin] = useState<Erc20Coin>('ETH')
   const [balance, setBalance] = useState<bigint | undefined>(undefined)
   const [accountIndex, setAccountIndex] = useState(0)
+  const [endpoint, setEndpoint] = useState<TfcChainEndpoint>('openbi')
   const { t } = useTranslation()
 
   useEffect(() => {
+    setBalance(undefined)
     if (props.account && props.account.accountType === 'plain') {
       ipcRenderer.invoke('get-balance', props.account.privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
     } else if (props.account && props.account.accountType === 'bip44-sub-account') {
       ipcRenderer.invoke('get-balance', props.account.keys[accountIndex].privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
-    } else {
-      setBalance(undefined)
     }
   }, [props.account, accountIndex, ercCoin])
 
@@ -176,6 +203,10 @@ function AccountDetailView(props: AccountDetailViewProps) {
   const onChooseIndex = (newIndex: number) => {
     setAccountIndex(newIndex)
     props.onChooseIndex(newIndex)
+  }
+
+  const onChooseEndpoint = (newEndpoint: TfcChainEndpoint) => {
+    setEndpoint(newEndpoint)
   }
 
   return (
@@ -209,6 +240,8 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
               {props.account.accountType === 'bip44-sub-account' && <AccountDetailChooseIndex index={accountIndex} onChoose={onChooseIndex} />}
 
+              {(props.account.accountType !== 'bip44-master' && props.account.coinType === 'TFC') && <AccountDetailChooseEndpoint endpoint={endpoint} onChoose={onChooseEndpoint} />}
+
               {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
 
               <AccountDetailKeys
@@ -216,7 +249,7 @@ function AccountDetailView(props: AccountDetailViewProps) {
                 privKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].privKey : props.account.privKey}
                 address={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].address : (props.account as AccountDataPlain).address} />
 
-              <AccountDetailFurtherAction onRemove={() => { }} />
+              <AccountDetailFurtherAction onRemove={props.onRemoveAccount} account={props.account} />
 
             </div>
 
