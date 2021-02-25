@@ -7,6 +7,7 @@ import { ipcRenderer, Menu } from "electron";
 import useBalance from "./useBalance";
 import { useTranslation } from 'react-i18next'
 import DescriptionText from "./DescriptionText";
+import { TransferRecord } from "../core/blockchain";
 
 interface AccountDetailViewProps {
   account?: AccountData | AccountDataBip44SubAccount
@@ -101,10 +102,19 @@ function AccountDetailChooseEndpoint(props: { endpoint: TfcChainEndpoint, onChoo
 function AccountDetailKeys(props: { privKey?: string, pubKey?: string, mnemonic?: string, address?: string }) {
   return (
     <div style={{ margin: '16px 0px' }}>
-      {props.privKey && <Typography style={{ overflowWrap: 'break-word' }}>Private Key: {props.privKey}</Typography>}
-      {props.pubKey && <Typography style={{ overflowWrap: 'break-word' }}>Public Key: {props.pubKey}</Typography>}
-      {props.address && <Typography style={{ overflowWrap: 'break-word' }}>Address: {props.address}</Typography>}
-      {props.mnemonic && <Typography>Mnemonic: {props.mnemonic}</Typography>}
+      {
+        [[props.privKey, 'Private Key'],
+        [props.pubKey, 'Public Key'],
+        [props.mnemonic, 'Mnemonic'],
+        [props.address, 'Address']].map(v => (
+          v[0] && (
+            <div style={{ margin: '8px 0px' }}>
+              <Typography variant="overline" color="textSecondary" style={{ lineHeight: '0' }}>{v[1]}</Typography>
+              <Typography style={{ overflowWrap: 'break-word' }}>{v[0]}</Typography>
+            </div>
+          )
+        ))
+      }
     </div>
   )
 }
@@ -175,6 +185,10 @@ function AccountDetailFurtherAction(props: { onRemove: () => any, account: Accou
       </Button>}
     </div>
   )
+}
+
+function AccountDetailTxHistory(props: { history: TransferRecord[] }) {
+
 }
 
 function AccountDetailView(props: AccountDetailViewProps) {

@@ -36,6 +36,12 @@ const resources: Resource = {
                 formatPrivKey: 'Private Key',
                 coinTypeFieldText: 'Coin Type',
                 createAccountTip: 'If you want to generate a new account, leave this field empty.'
+            },
+            swapTfc: {
+                swapTfcTitle: 'Swap TFC to TFC-ERC20',
+                swapTfcDescription: 'You can exchange TFC-Chain for TFC-ERC20. About {{txFee}} ETH will be deducted from the ETH account.',
+                destinationAccountInputLabel: 'Private Key of the Destination Account',
+                amountInputLabel: 'Amount'
             }
         }
     },
@@ -72,6 +78,12 @@ const resources: Resource = {
                 formatPrivKey: '私钥',
                 coinTypeFieldText: '货币种类',
                 createAccountTip: '如果您想创建一个新账户，请在此处留空。'
+            },
+            swapTfc: {
+                swapTfcTitle: '转换TFC为TFC-ERC20',
+                swapTfcDescription: '能可以将TFC-Chain转换为TFC-ERC20。大约{{txFee}}ETH会从您的目标账户中扣除。',
+                destinationAccountInputLabel: '目标ETH账户的私钥',
+                amountInputLabel: '数量'
             }
         }
     }

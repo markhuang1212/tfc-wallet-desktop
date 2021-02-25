@@ -157,6 +157,8 @@ function App() {
   const onRemoveAccount = async () => {
     const privKey = (accountDetailData as AccountData).privKey
     await ipcRenderer.invoke('remove-account', privKey)
+    setAccountData(await ipcRenderer.invoke('get-accounts'))
+    setAccountDetailData(undefined)
   }
 
   return (<div style={{

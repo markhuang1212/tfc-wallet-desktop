@@ -41,11 +41,7 @@ ipcMain.handle('create-plain-account', async (event, coinType: 'BTC' | 'ETH' | '
 
 ipcMain.handle('create-bip44-account', async (event, privKey: string | string[]) => {
     console.log(`Receive signal: Create BIP44 Wallet, privKey ${privKey}`)
-    if (typeof privKey === 'string') {
-        WalletController.shared.loadWallet(privKey)
-    } else if (typeof privKey === 'object') {
-        WalletController.shared.loadWallet(privKey)
-    }
+    WalletController.shared.loadWallet(privKey)
 })
 
 ipcMain.handle('remove-account', async (event, privKey: string) => {

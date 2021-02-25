@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Wallet, WalletJSON } from "../core/wallet";
 import { CoinCode } from "../core/defines";
 import { generateMnemonic } from 'bip39'
+import crypto from 'crypto'
 
 interface WalletInfo {
     passphrase?: string
@@ -37,9 +38,7 @@ class WalletController {
         this.walletPsc.saveSync()
     }
 
-    loadWallet(mnemonic: string[]): void;
-    loadWallet(seed: string): void;
-    loadWallet(arg: any) {
+    loadWallet(arg: string | string[]) {
         if (typeof arg === 'string') {
 
             try {
@@ -76,6 +75,10 @@ class WalletController {
     }
 
     loadStandaloneAccount(coinType: 'ETH' | 'BTC' | 'TFC', privKey: string) {
+
+        if (privKey === '') {
+            privKey = crypto.randomBytes(32).toString('hex')
+        }
 
         if (Buffer.from(privKey, 'hex').length !== 32) {
             throw Error('Invalid private key')

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AccountData } from "./../Types";
 import AccountListItem from "./AccountListItem";
 import { Divider, makeStyles, Toolbar, Typography, Button, List, Box, Icon, IconButton } from "@material-ui/core";
@@ -19,6 +19,10 @@ function AccountListView(props: AccountListViewProps) {
 
   const [focusedItemIndex, setFocusedItemIndex] = useState(-1)
   const { t } = useTranslation()
+
+  useEffect(() => {
+    setFocusedItemIndex(-1)
+  }, [props.accounts])
 
   return (
     <div style={{
