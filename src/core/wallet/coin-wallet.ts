@@ -26,6 +26,18 @@ export class CoinWallet<C extends CoinCode> extends HDWallet {
     this.standalonePrivateKeys = standalonePrivateKeys;
   }
 
+  // eslint-disable-next-line require-jsdoc
+  removeStandaloneAccount(privateKey: string | Buffer) {
+    const privateKeyStr =
+      typeof privateKey === 'string' ? privateKey : privateKey.toString('hex');
+    const removeIndex = this.standalonePrivateKeys.findIndex(
+        (key) => key.toString('hex') === privateKeyStr,
+    );
+    if (removeIndex!==-1) {
+      this.standalonePrivateKeys.splice(removeIndex, 1);
+    }
+  }
+
   /* The method that defines the keyPair strategy for each coin */
   // eslint-disable-next-line require-jsdoc
   privateKeyToAccount(privateKey: Buffer): AccountImplMapping[C] {
