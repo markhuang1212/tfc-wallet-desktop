@@ -3,6 +3,7 @@ import config from "../core/config"
 import { CoinCode } from "../core/defines"
 import { EthAccount, TfcChainAccount, Wallet } from "../core/wallet"
 import { TxRequestInfo } from "../Types"
+import { utils } from 'ethers'
 
 class AccountFunctionsProvider {
 
@@ -15,20 +16,23 @@ class AccountFunctionsProvider {
         if (coinType === 'ETH' && ercCoin === 'ETH') {
             const account = new EthAccount(Buffer.from(privKey, 'hex'))
             const balance = await this.ethChain.getBalance(account)
-            return BigInt(balance.toString())
+            const balance_formatted = utils.formatUnits(balance.toString(), 18)
+            return balance_formatted
         }
         if (coinType === 'ETH' && ercCoin === 'TFC') {
             const account = new EthAccount(Buffer.from(privKey, 'hex'))
             const contract_address = config[CoinCode.ETH].rinkeby.contracts.TFC_ERC20
             const balance = await this.ethChain.erc20BalanceOf(contract_address, account)
-            return BigInt(balance.toString())
+            const balance_formatted = utils.formatUnits(balance.toString(), 18)
+            return balance_formatted
         }
         if (coinType === 'TFC') {
             const account = new TfcChainAccount(Buffer.from(privKey, 'hex'))
             const balance = await this.tfcChain.getBalance(account)
-            return BigInt(balance.toString())
+            const balance_formatted = utils.formatUnits(balance.toString(), 18)
+            return balance_formatted
         }
-        return 0n
+        return '0'
     }
 
     async getTransactions(pubKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') {
@@ -66,7 +70,7 @@ class AccountFunctionsProvider {
         }
     }
 
-    swapTfc(from_privKey: string, to_privKey: string, amount: bigint) {
+    swapTfc(from_privKey: string, to_privKey: string, amount: bigint, endpoint?: 'openbi' | 'blockchainfs') {
         return new Promise<string>((res, rej) => {
             let tfcAccount!: TfcChainAccount
             let ercAccount!: EthAccount

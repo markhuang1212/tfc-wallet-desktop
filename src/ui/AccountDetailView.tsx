@@ -8,6 +8,7 @@ import useBalance from "./useBalance";
 import { useTranslation } from 'react-i18next'
 import DescriptionText from "./DescriptionText";
 import { TransferRecord } from "../core/blockchain";
+import { BigNumberish, utils } from 'ethers'
 
 interface AccountDetailViewProps {
   account?: AccountData | AccountDataBip44SubAccount
@@ -195,7 +196,7 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
   const classes = useStyle()
   const [ercCoin, setErcCoin] = useState<Erc20Coin>('ETH')
-  const [balance, setBalance] = useState<bigint | undefined>(undefined)
+  const [balance, setBalance] = useState<string | undefined>(undefined)
   const [accountIndex, setAccountIndex] = useState(0)
   const [endpoint, setEndpoint] = useState<TfcChainEndpoint>('openbi')
   const { t } = useTranslation()
@@ -256,7 +257,7 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
               {(props.account.accountType !== 'bip44-master' && props.account.coinType === 'TFC') && <AccountDetailChooseEndpoint endpoint={endpoint} onChoose={onChooseEndpoint} />}
 
-              {balance !== undefined && <AccountDetailBalance balance={balance.toString()} />}
+              {balance !== undefined && <AccountDetailBalance balance={balance} />}
 
               <AccountDetailKeys
                 pubKey={props.account.accountType === 'bip44-sub-account' ? props.account.keys[accountIndex].pubKey : (props.account as AccountDataPlain).pubKey}

@@ -80,6 +80,7 @@
         "erc-20-abi": "^1.0.0",
         "ethereumjs-util": "^7.0.8",
         "ethereumjs-wallet": "^1.0.1",
+        "ethers": "^5.0.31",
         "express": "^4.17.1",
         "file-loader": "^6.2.0",
         "fontsource-roboto": "^4.0.0",
