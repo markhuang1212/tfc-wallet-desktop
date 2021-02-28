@@ -10,10 +10,23 @@ export interface TxRequestInfo {
     amount: bigint
 }
 
+export type BalanceRequestInfo = {
+    coinType: 'ETH'
+    privKey: string
+    ercCoin: Erc20Coin
+} | {
+    coinType: 'TFC'
+    privKey: string
+    endpoint: TfcChainEndpoint
+} | {
+    coinType: 'BTC'
+    privKey: string
+}
+
 export interface SwapRequestInfo {
     from_privKey: string,
     to_privKey: string,
-    from_endpoint: string
+    endpoint: TfcChainEndpoint
 }
 
 export type Coin = 'ETH' | 'BTC' | 'TFC'
