@@ -117,7 +117,7 @@ export class TfcChain extends Chain<CoinCode.TFC_CHAIN> {
         async (resolve, reject, emitter) => {
           try {
             let resp = await axios.delete(
-                `${this.endpoint}/v4/estimateTx/${tfcAddress}`,
+                `${this.endpoint}/v4/estimatedTx/${tfcAddress}`,
             );
             TfcChain.throwIfAPIError(resp);
             resp = await axios.post(`${this.endpoint}/v4/estimateTx`, {
