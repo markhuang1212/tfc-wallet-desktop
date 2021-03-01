@@ -1,22 +1,40 @@
 const balanceCached = new Map() as Map<string, bigint>
 import crypto from 'crypto'
+import { ipcRenderer } from 'electron'
 import { useEffect, useState } from 'react'
+import { BalanceRequestInfo, Coin, Erc20Coin, TfcChainEndpoint, TxRequestInfo } from '../Types'
 
-function makeHashedKey(privKey: string, coinType: 'BTC' | 'ETH' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') {
-    const hash = crypto.createHash('sha-256')
-    hash.push(privKey)
-    hash.push(coinType)
-    hash.push(ercCoin)
-    return hash.digest().toString('hex')
-}
+function useBalance({ coinType, privKey, ercCoin, endpoint }: BalanceRequestInfo) {
 
-async function getBalance(privKey: string, coinType: 'BTC' | 'ETH' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') {
-    return 100n
-}
+    const [balance, setBalance] = useState<string | undefined>(undefined)
+    const [cache, setCache] = useState<(BalanceRequestInfo & { balance: string })[]>([])
 
-function useBalance(privKey: string, coinType: 'BTC' | 'ETH' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') {
+    useEffect(() => {
 
-    const [balance, setBalance] = useState(100n)
+        if (privKey === '') {
+            setBalance(undefined)
+            return
+        }
+
+        const cacheObj = cache.find(v => (
+            v.coinType === coinType &&
+            v.privKey === privKey &&
+            (coinType !== 'TFC' || v.endpoint === endpoint) &&
+            (coinType !== 'ETH' || v.ercCoin === ercCoin)
+        ))
+
+        if (cacheObj) {
+            setBalance(cacheObj.balance)
+        } else {
+            setBalance(undefined)
+            ipcRenderer.invoke('get-balance', { coinType, privKey, ercCoin, endpoint }).then(b => {
+                cache.push({
+                    coinType, privKey, ercCoin, endpoint, balance: b
+                })
+                setBalance(b)
+            })
+        }
+    }, [coinType, privKey, ercCoin, endpoint])
 
     return balance
 

@@ -1,4 +1,4 @@
-import { AccountData, AccountDataBip44SubAccount, AccountDataPlain, Erc20Coin, TfcChainEndpoint } from "./../Types";
+import { AccountData, AccountDataBip44SubAccount, AccountDataPlain, Erc20Coin, TfcChainEndpoint, Coin } from "./../Types";
 import { AppBar, Button, Container, IconButton, InputLabel, FormControl, TextField, Toolbar, Typography, Select, MenuItem, FormControlLabel, InputAdornment, Input, OutlinedInput } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { ImportExport, Check, Done } from '@material-ui/icons'
@@ -196,19 +196,31 @@ function AccountDetailView(props: AccountDetailViewProps) {
 
   const classes = useStyle()
   const [ercCoin, setErcCoin] = useState<Erc20Coin>('ETH')
-  const [balance, setBalance] = useState<string | undefined>(undefined)
   const [accountIndex, setAccountIndex] = useState(0)
   const [endpoint, setEndpoint] = useState<TfcChainEndpoint>('openbi')
   const { t } = useTranslation()
 
-  useEffect(() => {
-    setBalance(undefined)
-    if (props.account && props.account.accountType === 'plain') {
-      ipcRenderer.invoke('get-balance', props.account.privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
-    } else if (props.account && props.account.accountType === 'bip44-sub-account') {
-      ipcRenderer.invoke('get-balance', props.account.keys[accountIndex].privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
-    }
-  }, [props.account, accountIndex, ercCoin])
+  let privKey: string | undefined
+  let coinType: Coin | undefined
+  if (props.account && props.account.accountType === 'plain') {
+    privKey = props.account.privKey
+    coinType = props.account.coinType
+  }
+  if (props.account && props.account.accountType === 'bip44-sub-account') {
+    privKey = props.account.keys[accountIndex].privKey
+    coinType = props.account.coinType
+  }
+
+  const balance = useBalance({ coinType: coinType ?? 'TFC', privKey: privKey ?? '', ercCoin, endpoint })
+
+  // useEffect(() => {
+  //   setBalance(undefined)
+  //   if (props.account && props.account.accountType === 'plain') {
+  //     ipcRenderer.invoke('get-balance', props.account.privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
+  //   } else if (props.account && props.account.accountType === 'bip44-sub-account') {
+  //     ipcRenderer.invoke('get-balance', props.account.keys[accountIndex].privKey, props.account.coinType, ercCoin).then(balance => setBalance(balance))
+  //   }
+  // }, [props.account, accountIndex, ercCoin])
 
   const onChooseErcCoin = (coin: 'ETH' | 'TFC' | 'USDT') => {
     setErcCoin(coin)

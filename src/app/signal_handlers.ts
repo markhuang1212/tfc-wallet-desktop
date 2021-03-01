@@ -4,7 +4,7 @@
  */
 
 import { ipcMain } from 'electron'
-import { TxRequestInfo } from '../Types'
+import { BalanceRequestInfo, TxRequestInfo } from '../Types'
 import AccountFunctionsProvider from './AccountFunctionsProvider'
 import WalletController from './WalletController'
 
@@ -29,9 +29,16 @@ ipcMain.handle('rename-account', (_, privKey: string, newName: string) => {
     return WalletController.shared.renameAccount(privKey, newName)
 })
 
-ipcMain.handle('get-balance', async (_, privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
-    console.log(`Receive signal: get-balance, privKey: ${privKey}, coinType: ${coinType}, ercCoin: ${ercCoin}`)
-    const balance = await AccountFunctionsProvider.shared.getBalance(privKey, coinType, ercCoin)
+// ipcMain.handle('get-balance', async (_, privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') => {
+//     console.log(`Receive signal: get-balance, privKey: ${privKey}, coinType: ${coinType}, ercCoin: ${ercCoin}`)
+//     const balance = await AccountFunctionsProvider.shared.getBalance(privKey, coinType, ercCoin)
+//     return balance
+// }
+
+ipcMain.handle('get-balance', async (_, balanceRequest: BalanceRequestInfo) => {
+    console.log(`Receive signal: get-balance`)
+    console.log(balanceRequest)
+    const balance = await AccountFunctionsProvider.shared.getBalance(balanceRequest.privKey, balanceRequest.coinType, balanceRequest.ercCoin)
     return balance
 })
 

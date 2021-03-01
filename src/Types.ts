@@ -11,16 +11,10 @@ export interface TxRequestInfo {
 }
 
 export type BalanceRequestInfo = {
-    coinType: 'ETH'
+    coinType: Coin
     privKey: string
-    ercCoin: Erc20Coin
-} | {
-    coinType: 'TFC'
-    privKey: string
-    endpoint: TfcChainEndpoint
-} | {
-    coinType: 'BTC'
-    privKey: string
+    ercCoin?: Erc20Coin
+    endpoint?: TfcChainEndpoint
 }
 
 export interface SwapRequestInfo {

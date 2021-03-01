@@ -1,4 +1,4 @@
-import { EthereumChain, TfcChain } from "../core/blockchain"
+import { EthereumChain, TfcChain, VsysChain } from "../core/blockchain"
 import config from "../core/config"
 import { CoinCode } from "../core/defines"
 import { EthAccount, TfcChainAccount, Wallet } from "../core/wallet"
@@ -11,6 +11,7 @@ class AccountFunctionsProvider {
 
     ethChain = new EthereumChain(config[CoinCode.ETH].rinkeby.endpoint)
     tfcChain = new TfcChain(config[CoinCode.TFC_CHAIN]['openbi'].endpoint)
+    vsysChain = new VsysChain()
 
     async getBalance(privKey: string, coinType: 'ETH' | 'BTC' | 'TFC', ercCoin?: 'ETH' | 'TFC' | 'USDT') {
         if (coinType === 'ETH' && ercCoin === 'ETH') {
